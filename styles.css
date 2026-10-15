@@ -13,6 +13,8 @@
   --brass: #c8a25e;
   --brass-deep: #9a7a42;
   --brass-soft: rgba(200, 162, 94, 0.10);
+  --azalea: #df5f8f;
+  --azalea-soft: rgba(223, 95, 143, 0.10);
   --moss: #7e9070;
   --border: rgba(200, 162, 94, 0.14);
   --border-soft: rgba(237, 231, 214, 0.07);
@@ -57,6 +59,7 @@ a { color: inherit; text-decoration: none; }
 }
 .logo { font-family: var(--font-display); font-weight: 600; font-size: 21px; letter-spacing: 0.01em; }
 .accent { color: var(--brass); }
+.logo .accent { color: var(--azalea); }
 .nav-links { display: flex; gap: 28px; align-items: center; }
 .nav-links a { font-size: 14px; color: var(--text-dim); font-weight: 500; transition: color 0.2s; }
 .nav-links a:hover { color: var(--ink); }
@@ -71,6 +74,11 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 32px; }
 
 /* HERO */
 .hero { padding: 170px 0 110px; position: relative; }
+.hero::before {
+  content: ''; position: absolute; top: -120px; left: -140px; width: 560px; height: 560px;
+  background: radial-gradient(circle, rgba(223, 95, 143, 0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
 .topo {
   position: absolute; top: -60px; right: -140px; width: 560px; height: 560px;
   opacity: 0.55; pointer-events: none;
@@ -91,7 +99,7 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 32px; }
   font-size: clamp(60px, 9.5vw, 112px); line-height: 0.96; letter-spacing: -0.015em;
   margin-bottom: 28px; color: var(--ink);
 }
-.hero h1 .accent { font-style: italic; font-weight: 480; }
+.hero h1 .accent { font-style: italic; font-weight: 480; color: var(--azalea); }
 .hero-sub { font-size: 19px; color: var(--text-dim); max-width: 640px; margin-bottom: 22px; }
 .hero-sub strong { color: var(--ink); font-weight: 600; }
 .hero-meta { display: flex; gap: 12px; align-items: center; font-size: 13px; color: var(--text-faint); margin-bottom: 36px; font-family: var(--font-mono); letter-spacing: 0.03em; }
