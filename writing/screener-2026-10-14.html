@@ -18,7 +18,6 @@
     <a href="../index.html#projects">Projects</a>
     <a href="../index.html#experience">Experience</a>
     <a href="../index.html#writing">Writing</a>
-    <a href="../index.html#principles">Principles</a>
     <a href="../index.html#contact" class="nav-cta">Contact</a>
   </nav>
 </header>
@@ -27,34 +26,26 @@
   <a href="../index.html#writing" class="back-link">← All writing</a>
   <p class="article-meta"><span>Oct 14, 2026</span><span>·</span><span>Research screener</span></p>
   <h1>Weekday AI Research Screener</h1>
-  <p><strong>Focus:</strong> AI/ML for insurance product work — entity extraction, resolution, and linkage in templated text · graph fraud methods · GraphRAG + rigorous evaluation · specialized multi-agent systems.</p>
+  <p>I read a lot of research. Most of it isn't worth your time. This is what was this week — four papers on GraphRAG, entity extraction, and multi-agent systems, with my notes on what actually transfers to insurance work.</p>
 
   <h2>1. TopoGraphRAG-Bench <span style="font-size:15px;color:var(--text-faint)">(NeurIPS 2026)</span></h2>
-  <p><strong>Premise in plain language:</strong> Current GraphRAG systems still fail to recover the intended evidence topology when key dependencies sit in figures or tables rather than pure text.</p>
-  <p><strong>What matters:</strong> 2,024 questions over 201 long, visually rich documents. Questions built bottom-up from layout-grounded evidence units — text, figures, tables with OCR/VLM descriptions. Three controlled topologies: single-hop retrieval, bridge-chain reasoning, multi-source synthesis. Multimodal GraphRAG leads overall but degrades when visual-textual alignment or multi-unit composition is incomplete. Code and data released.</p>
-  <p><strong>Why it matters for insurance:</strong> Claims, policies, and FNOL packets routinely distribute evidence across prose, loss tables, photo captions, and form layouts. A text-derived entity-relation graph will silently drop the bridge linking a deductible schedule (table) to a coverage exclusion (text). The extraction pipeline has to treat layout units as first-class nodes — and evaluation must measure topology recovery, not just answer F1.</p>
-  <p><em>Reaction: thin outside the paper itself; no independent replications yet.</em></p>
+  <p>The problem is real and underappreciated: GraphRAG systems can't recover the intended evidence topology when key dependencies sit in figures and tables instead of pure text. The authors built 2,024 questions over 201 long, visually rich documents and tested three controlled topologies — single-hop retrieval, bridge-chain reasoning, multi-source synthesis. Multimodal GraphRAG leads overall but still degrades when visual-textual alignment is incomplete. Code and data are released, which is the part I actually care about.</p>
+  <p>What I'd steal: claims packets are exactly this problem. A deductible schedule in a table, a coverage exclusion in prose, a damage photo tied to a prior claim — a text-derived entity graph silently drops the bridges between them. Your extraction pipeline needs to treat layout units as first-class nodes, and your evals need to measure topology recovery, not answer F1. Otherwise GraphRAG looks strong on narrative and fails exactly where adjusters need the connecting evidence.</p>
 
   <h2>2. BEACON-SP <span style="font-size:15px;color:var(--text-faint)">(arXiv, Oct 2026)</span></h2>
-  <p><strong>Premise in plain language:</strong> An ontology-grounded patient knowledge graph plus two-pass GraphRAG retrieval improves clinical relevance and completeness over vector RAG on multi-hop questions.</p>
-  <p><strong>What matters:</strong> Typed graph schema (247 attributes across 12 domains); retrieval via seed matching plus bounded breadth-first expansion inside an isolated subgraph. Under a corrected paired protocol, GraphRAG was preferred in 76.4% of criterion-level comparisons — biggest gains on relevance (93.9%) and completeness (84.0%). Gains concentrate on relational tasks.</p>
-  <p><strong>Why it matters for insurance:</strong> The analogous failure is treating medical notes, pharmacy records, and prior claim narratives as isolated chunks. An ontology linking "prior lumbar injury," "opioid regimen," and "current pain complaint" surfaces relational patterns pure embedding search misses. Requires a maintained, versioned domain ontology and claim-isolated graphs.</p>
-  <p><em>Reaction: limited to the preprint; no independent validation reported.</em></p>
+  <p>An ontology-grounded patient knowledge graph plus two-pass GraphRAG retrieval. On 1,500 queries across 100 synthetic patients, GraphRAG was preferred in 76.4% of criterion-level comparisons once the eval protocol was fixed — biggest gains on clinical relevance (93.9%) and completeness (84.0%). The gains concentrate on relational tasks, which is the tell.</p>
+  <p>What I'd steal: stop treating medical notes, pharmacy records, and prior claim narratives as isolated chunks. An ontology that explicitly links "prior lumbar injury" to "opioid regimen" to "current pain complaint" surfaces the relational pattern that pure embedding search misses. But it only works with a maintained, versioned domain ontology and claim-isolated graphs — and an eval that doesn't penalize graph-derived constructs just because they aren't verbatim in the source. Without those three, you're adding latency without reliability.</p>
 
   <h2>3. GAMA <span style="font-size:15px;color:var(--text-faint)">(arXiv, Oct 2026)</span></h2>
-  <p><strong>Premise in plain language:</strong> Decomposing biomedical NER into guideline induction, verification, planning, schema-constrained coding, and dual-loop refinement measurably reduces boundary errors, type mistakes, and invalid formats vs. standard LLM prompting.</p>
-  <p><strong>What matters:</strong> An agent induces annotation rules from labeled data; a second agent verifies them; planning and coding agents emit schema-constrained entity objects; a verification module runs dual-loop refinement on failures. Removing the verification loop drops F1 2–4 points; removing guideline modeling drops another 3–5.</p>
-  <p><strong>Why it matters for insurance:</strong> For entity extraction inside long templated claims or medical notes, the failure mode is free-form generation producing overlapping spans or type assignments that violate the downstream schema. Schema-as-code plus verified guidelines directly attacks that — but only if quality annotations exist to induce them and the schema matches the resolution layer.</p>
-  <p><em>Reaction: essentially nil beyond the arXiv announcement.</em></p>
+  <p>They decomposed biomedical NER into guideline induction, verification, planning, schema-constrained coding, and dual-loop refinement — and it measurably beats standard LLM prompting on boundary errors, type mistakes, and invalid formats. The ablations are the interesting part: kill the verification loop, lose 2–4 F1 points. Kill guideline modeling, lose another 3–5.</p>
+  <p>What I'd steal: for entity extraction inside long templated claims or medical notes, the failure mode is free-form generation producing overlapping spans or type assignments that violate the downstream schema. Schema-as-code plus verified, dataset-specific guidelines directly attacks that. But only if you have real annotations to induce the guidelines from — zero-shot versions will drift, and then the structural control evaporates and linkage errors reappear downstream.</p>
 
   <h2>4. Graph-R1 <span style="font-size:15px;color:var(--text-faint)">(ICML 2026)</span></h2>
-  <p><strong>Premise in plain language:</strong> Treating GraphRAG retrieval as a multi-turn agent-environment interaction and optimizing it end-to-end with RL improves reasoning accuracy and retrieval efficiency over fixed one-shot GraphRAG.</p>
-  <p><strong>What matters:</strong> Lightweight knowledge hypergraph; agent trained on a think–query–retrieve–rethink cycle under end-to-end reward. Qwen2.5-7B reaches average F1 57.82, ahead of Search-R1, R1-Searcher, standard RAG, and HyperGraphRAG. Code is public.</p>
-  <p><strong>Why it matters for insurance:</strong> In a multi-agent claims system, ordinary GraphRAG does a single retrieval pass that under-expands or floods context. An RL-tuned multi-turn policy can learn when to stop expanding the fraud or coverage subgraph — but the reward has to measure insurance-relevant outcomes (correct party linkage, explainable paths), not generic QA F1.</p>
-  <p><em>Reaction: mostly within the academic GraphRAG community; practitioner posts are thin hackathon demos.</em></p>
+  <p>GraphRAG retrieval treated as a multi-turn agent-environment interaction, optimized end-to-end with RL. Think–generate-query–retrieve-subgraph–rethink, under an end-to-end reward. It beats fixed one-shot GraphRAG and the RL-enhanced RAG baselines, and the code is public.</p>
+  <p>What I'd steal: in a multi-agent claims system, ordinary GraphRAG does a single retrieval pass that either under-expands or floods the context. An RL-tuned policy that learns when to stop expanding the fraud or coverage subgraph is the right shape — but only if the reward measures insurance-relevant outcomes (correct party linkage, explainable paths), not generic QA F1. Optimize for the benchmark and you get benchmark artifacts.</p>
 
   <h2>Skipped this week</h2>
-  <p>TigerGraph hackathon write-ups and "agentic GraphRAG" Medium posts claiming large accuracy jumps on synthetic Wikipedia corpora. Right intuition, but no insurance-grade graphs, no controlled ablations against strong hybrid baselines, no topology or faithfulness metrics. Not worth the time.</p>
+  <p>TigerGraph hackathon write-ups and "agentic GraphRAG" Medium posts claiming big accuracy jumps on synthetic Wikipedia corpora. Right intuition, but no insurance-grade graphs, no controlled ablations against strong hybrid baselines, no topology or faithfulness metrics. Not worth the time.</p>
 
   <p style="color:var(--text-faint);font-size:14px;">Sources: arXiv preprints (TopoGraphRAG-Bench 2610.09360, BEACON-SP 2610.09026, GAMA 2610.02970) and ICML 2026 proceedings (Graph-R1).</p>
 </article>
