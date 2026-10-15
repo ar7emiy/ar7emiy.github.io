@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekday AI Research Screener — Oct 14, 2026 — Artemiy Yalovenko</title>
+<meta name="description" content="Research notes on GraphRAG, entity extraction, and multi-agent systems — and what they mean for insurance product work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+<div class="grain"></div>
+<header class="nav">
+  <a href="../index.html" class="logo">AY<span class="accent">.</span></a>
+  <nav class="nav-links">
+    <a href="../index.html#projects">Projects</a>
+    <a href="../index.html#experience">Experience</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="../index.html#principles">Principles</a>
+    <a href="../index.html#contact" class="nav-cta">Contact</a>
+  </nav>
+</header>
+
+<article class="article">
+  <a href="../index.html#writing" class="back-link">← All writing</a>
+  <p class="article-meta"><span>Oct 14, 2026</span><span>·</span><span>Research screener</span></p>
+  <h1>Weekday AI Research Screener</h1>
+  <p><strong>Focus:</strong> AI/ML for insurance product work — entity extraction, resolution, and linkage in templated text · graph fraud methods · GraphRAG + rigorous evaluation · specialized multi-agent systems.</p>
+
+  <h2>1. TopoGraphRAG-Bench <span style="font-size:15px;color:var(--text-faint)">(NeurIPS 2026)</span></h2>
+  <p><strong>Premise in plain language:</strong> Current GraphRAG systems still fail to recover the intended evidence topology when key dependencies sit in figures or tables rather than pure text.</p>
+  <p><strong>What matters:</strong> 2,024 questions over 201 long, visually rich documents. Questions built bottom-up from layout-grounded evidence units — text, figures, tables with OCR/VLM descriptions. Three controlled topologies: single-hop retrieval, bridge-chain reasoning, multi-source synthesis. Multimodal GraphRAG leads overall but degrades when visual-textual alignment or multi-unit composition is incomplete. Code and data released.</p>
+  <p><strong>Why it matters for insurance:</strong> Claims, policies, and FNOL packets routinely distribute evidence across prose, loss tables, photo captions, and form layouts. A text-derived entity-relation graph will silently drop the bridge linking a deductible schedule (table) to a coverage exclusion (text). The extraction pipeline has to treat layout units as first-class nodes — and evaluation must measure topology recovery, not just answer F1.</p>
+  <p><em>Reaction: thin outside the paper itself; no independent replications yet.</em></p>
+
+  <h2>2. BEACON-SP <span style="font-size:15px;color:var(--text-faint)">(arXiv, Oct 2026)</span></h2>
+  <p><strong>Premise in plain language:</strong> An ontology-grounded patient knowledge graph plus two-pass GraphRAG retrieval improves clinical relevance and completeness over vector RAG on multi-hop questions.</p>
+  <p><strong>What matters:</strong> Typed graph schema (247 attributes across 12 domains); retrieval via seed matching plus bounded breadth-first expansion inside an isolated subgraph. Under a corrected paired protocol, GraphRAG was preferred in 76.4% of criterion-level comparisons — biggest gains on relevance (93.9%) and completeness (84.0%). Gains concentrate on relational tasks.</p>
+  <p><strong>Why it matters for insurance:</strong> The analogous failure is treating medical notes, pharmacy records, and prior claim narratives as isolated chunks. An ontology linking "prior lumbar injury," "opioid regimen," and "current pain complaint" surfaces relational patterns pure embedding search misses. Requires a maintained, versioned domain ontology and claim-isolated graphs.</p>
+  <p><em>Reaction: limited to the preprint; no independent validation reported.</em></p>
+
+  <h2>3. GAMA <span style="font-size:15px;color:var(--text-faint)">(arXiv, Oct 2026)</span></h2>
+  <p><strong>Premise in plain language:</strong> Decomposing biomedical NER into guideline induction, verification, planning, schema-constrained coding, and dual-loop refinement measurably reduces boundary errors, type mistakes, and invalid formats vs. standard LLM prompting.</p>
+  <p><strong>What matters:</strong> An agent induces annotation rules from labeled data; a second agent verifies them; planning and coding agents emit schema-constrained entity objects; a verification module runs dual-loop refinement on failures. Removing the verification loop drops F1 2–4 points; removing guideline modeling drops another 3–5.</p>
+  <p><strong>Why it matters for insurance:</strong> For entity extraction inside long templated claims or medical notes, the failure mode is free-form generation producing overlapping spans or type assignments that violate the downstream schema. Schema-as-code plus verified guidelines directly attacks that — but only if quality annotations exist to induce them and the schema matches the resolution layer.</p>
+  <p><em>Reaction: essentially nil beyond the arXiv announcement.</em></p>
+
+  <h2>4. Graph-R1 <span style="font-size:15px;color:var(--text-faint)">(ICML 2026)</span></h2>
+  <p><strong>Premise in plain language:</strong> Treating GraphRAG retrieval as a multi-turn agent-environment interaction and optimizing it end-to-end with RL improves reasoning accuracy and retrieval efficiency over fixed one-shot GraphRAG.</p>
+  <p><strong>What matters:</strong> Lightweight knowledge hypergraph; agent trained on a think–query–retrieve–rethink cycle under end-to-end reward. Qwen2.5-7B reaches average F1 57.82, ahead of Search-R1, R1-Searcher, standard RAG, and HyperGraphRAG. Code is public.</p>
+  <p><strong>Why it matters for insurance:</strong> In a multi-agent claims system, ordinary GraphRAG does a single retrieval pass that under-expands or floods context. An RL-tuned multi-turn policy can learn when to stop expanding the fraud or coverage subgraph — but the reward has to measure insurance-relevant outcomes (correct party linkage, explainable paths), not generic QA F1.</p>
+  <p><em>Reaction: mostly within the academic GraphRAG community; practitioner posts are thin hackathon demos.</em></p>
+
+  <h2>Skipped this week</h2>
+  <p>TigerGraph hackathon write-ups and "agentic GraphRAG" Medium posts claiming large accuracy jumps on synthetic Wikipedia corpora. Right intuition, but no insurance-grade graphs, no controlled ablations against strong hybrid baselines, no topology or faithfulness metrics. Not worth the time.</p>
+
+  <p style="color:var(--text-faint);font-size:14px;">Sources: arXiv preprints (TopoGraphRAG-Bench 2610.09360, BEACON-SP 2610.09026, GAMA 2610.02970) and ICML 2026 proceedings (Graph-R1).</p>
+</article>
+
+<footer>
+  <p>© 2026 Artemiy Yalovenko · Built by hand, shipped with intent.</p>
+</footer>
+</body>
+</html>
