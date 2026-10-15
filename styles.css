@@ -351,5 +351,7 @@ footer {
   .tl-item { grid-template-columns: 1fr; gap: 8px; }
   .writing-item { grid-template-columns: 1fr 30px; }
   .writing-date { display: none; }
+  .article { padding: 140px 16px 70px; }
+  .article .glass-panel { padding: 32px 24px; }
   .section { padding: 60px 0; }
 }
