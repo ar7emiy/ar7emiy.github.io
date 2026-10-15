@@ -157,6 +157,7 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 32px; }
 .tl-body h3 { font-family: var(--font-display); font-size: 20px; font-weight: 600; margin-bottom: 4px; }
 .tl-loc { color: var(--text-faint); font-weight: 400; font-size: 15px; }
 .tl-role { color: var(--accent); font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+.tl-achievements { color: var(--text-faint); font-size: 13.5px; font-family: var(--font-mono); margin-top: 12px; }
 .tl-body p:last-child { color: var(--text-dim); font-size: 15px; }
 
 /* WRITING */
