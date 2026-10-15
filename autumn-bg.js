@@ -85,12 +85,12 @@ function bend(x,y,time){
  const slope=(21*response(time,1.35,.32)*(2*h-h*h)/610)*ramp;
  return [x+dx,y-(x-250)*slope*.20+h*h*Math.sin(TAU*time/PERIOD*2)*.6*ramp];
 }
-// A narrow reconstruction band travels from the roots to the crown every 5s.
+// A narrow reconstruction band travels from the roots to the crown every 10s.
 // Each face folds toward its attachment edge and unfolds in place; no scene reset.
 function waveAmount(f,time){
  if(time<5||reduced.matches)return 1;
  const height=clamp((650-(f[1]+f[3]+f[5])/3)/610);
- const local=(time%5)-height*2.7;
+ const local=(time%10)-height*2.7;
  if(local<0||local>=.85)return 1;
  return local<.20?1-ease(local/.20):ease((local-.20)/.65);
 }
@@ -153,7 +153,7 @@ function draw(){
  if(tree>0)drawTree(tree,reduced.matches?0:wind);
  if(tree>=1&&!reduced.matches)drawLeaves(wind);
  slider.value=String(Math.round(formation*1000));
- setPhase(elapsed<ROOT_TIME?'Drawing foreground mounds':tree<1?'Root reached · maple assembling':terrain<1?'Building mountain contours · wind in the maple':'Wind · reconstruction wave every 5 seconds');
+ setPhase(elapsed<ROOT_TIME?'Drawing foreground mounds':tree<1?'Root reached · maple assembling':terrain<1?'Building mountain contours · wind in the maple':'Wind · reconstruction wave every 10 seconds');
 }
 function tick(now){
  if(!running){last=0;return;}
