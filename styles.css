@@ -279,6 +279,9 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 32px; position: relative; z
 }
 .glass-panel > * { position: relative; }
 .contact-panel { text-align: left; }
+.hero-panel { padding: 30px 34px; margin-bottom: 38px; max-width: 720px; }
+.hero-panel .hero-sub { margin-bottom: 16px; }
+.hero-panel .hero-meta { margin-bottom: 0; }
 .contact-panel .contact-sub { margin-bottom: 28px; }
 
 footer {
