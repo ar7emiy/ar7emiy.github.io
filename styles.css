@@ -158,6 +158,30 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 32px; }
 .tl-loc { color: var(--text-faint); font-weight: 400; font-size: 15px; }
 .tl-role { color: var(--accent); font-size: 14px; font-weight: 600; margin-bottom: 10px; }
 .tl-achievements { color: var(--text-faint); font-size: 13.5px; font-family: var(--font-mono); margin-top: 12px; }
+
+/* Resume */
+.resume-note { color: var(--text-dim); font-size: 15px; margin-bottom: 28px; max-width: 680px; }
+.resume-doc { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 16px; padding: 48px 52px; }
+.resume-name { font-size: 30px; letter-spacing: -0.5px; margin-bottom: 6px; }
+.resume-contact { color: var(--text-dim); font-size: 13.5px; margin-bottom: 20px; }
+.resume-summary { color: var(--text-dim); font-size: 15px; line-height: 1.7; margin-bottom: 8px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+.resume-h { font-size: 13px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--accent); margin: 32px 0 18px; }
+.resume-org { display: flex; justify-content: space-between; align-items: baseline; margin: 22px 0 4px; }
+.resume-org strong { font-size: 16px; letter-spacing: 0.5px; }
+.resume-org span { color: var(--text-faint); font-size: 13px; }
+.resume-role { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.resume-role strong { font-size: 14.5px; color: var(--text); font-weight: 600; }
+.resume-role span { color: var(--text-faint); font-size: 13px; font-family: var(--font-mono); white-space: nowrap; margin-left: 16px; }
+.resume-bullets { margin: 0 0 6px 18px; padding: 0; }
+.resume-bullets li { color: var(--text-dim); font-size: 14.5px; line-height: 1.65; margin-bottom: 7px; }
+.resume-skill { color: var(--text-dim); font-size: 14.5px; line-height: 1.65; margin-bottom: 7px; }
+.resume-detail { color: var(--text-dim); font-size: 14.5px; line-height: 1.65; margin-bottom: 7px; }
+.redacted { background: #000; color: transparent; border: 1px solid #2a2a2e; border-radius: 3px; padding: 0 10px; user-select: none; white-space: nowrap; }
+@media (max-width: 640px) {
+  .resume-doc { padding: 28px 22px; }
+  .resume-org, .resume-role { flex-direction: column; gap: 2px; }
+  .resume-role span { margin-left: 0; }
+}
 .tl-body p:last-child { color: var(--text-dim); font-size: 15px; }
 
 /* WRITING */
