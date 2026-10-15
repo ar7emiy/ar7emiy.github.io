@@ -45,7 +45,13 @@ body::before { display: none; }
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   --muted-foreground: #768274;
 }
-#maple-mirrored-wave canvas { display: block; width: 100vw; height: 100vh; transform: scaleX(-1); }
+#maple-mirrored-wave canvas {
+  display: block; width: 100vw; height: 100vh; transform: scaleX(-1);
+  /* feather the scene out where the hero text sits (mask flips with the canvas,
+     so the clear zone is defined at 72% to land at visual 28%) */
+  -webkit-mask-image: radial-gradient(85% 65% at 72% 42%, transparent 30%, black 78%);
+  mask-image: radial-gradient(85% 65% at 72% 42%, transparent 30%, black 78%);
+}
 
 ::selection { background: var(--lake); color: #fff; }
 
@@ -279,9 +285,6 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 32px; position: relative; z
 }
 .glass-panel > * { position: relative; }
 .contact-panel { text-align: left; }
-.hero-panel { padding: 30px 34px; margin-bottom: 38px; max-width: 720px; }
-.hero-panel .hero-sub { margin-bottom: 16px; }
-.hero-panel .hero-meta { margin-bottom: 0; }
 .contact-panel .contact-sub { margin-bottom: 28px; }
 
 footer {
