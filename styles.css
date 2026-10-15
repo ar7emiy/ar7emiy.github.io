@@ -37,16 +37,16 @@ body {
   overflow-x: hidden;
 }
 
-/* ambient liquid background */
+/* blueprint grid — flat, even, technical */
 body::before {
   content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
-    radial-gradient(900px 620px at 82% -8%, rgba(63, 124, 138, 0.22), transparent 62%),
-    radial-gradient(720px 520px at 8% 12%, rgba(189, 198, 213, 0.55), transparent 60%),
-    radial-gradient(640px 480px at 95% 62%, rgba(74, 97, 117, 0.16), transparent 60%),
-    radial-gradient(800px 600px at 12% 92%, rgba(26, 33, 16, 0.10), transparent 62%),
-    radial-gradient(560px 420px at 55% 45%, rgba(63, 124, 138, 0.08), transparent 60%),
-    linear-gradient(180deg, #f2f5f7 0%, #e9eef1 55%, #e3e9ec 100%);
+    linear-gradient(rgba(74, 97, 117, 0.10) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 97, 117, 0.10) 1px, transparent 1px),
+    linear-gradient(rgba(74, 97, 117, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 97, 117, 0.05) 1px, transparent 1px),
+    #edf1f3;
+  background-size: 220px 220px, 220px 220px, 44px 44px, 44px 44px, auto;
 }
 
 ::selection { background: var(--lake); color: #fff; }
