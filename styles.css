@@ -40,17 +40,27 @@ body {
 /* clear background — flat, clean, nothing competing with the glass */
 body::before { display: none; }
 
-/* autumn scaffolding — fixed animated background */
+/* autumn scaffolding — living artwork composed inside the hero.
+   Text column beside it on desktop, stacked below on phone.
+   Scrolls away with the hero: no fixed spots, no masks. */
+.hero-row {
+  display: grid; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: stretch;
+  margin-top: 8px;
+}
 #maple-mirrored-wave {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  position: relative; min-height: 430px;
+  border-radius: 20px; overflow: hidden;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  pointer-events: none;
   --muted-foreground: #768274;
 }
 #maple-mirrored-wave canvas {
-  display: block; width: 100vw; height: 100vh; transform: scaleX(-1);
-  /* feather the scene out where the hero text sits (mask flips with the canvas,
-     so the clear zone is defined at 72% to land at visual 28%) */
-  -webkit-mask-image: radial-gradient(85% 65% at 72% 42%, transparent 30%, black 78%);
-  mask-image: radial-gradient(85% 65% at 72% 42%, transparent 30%, black 78%);
+  display: block; width: 100%; height: 100%; transform: scaleX(-1);
+}
+@media (max-width: 900px) {
+  .hero-row { grid-template-columns: 1fr; gap: 0; }
+  #maple-mirrored-wave { height: 340px; min-height: 0; margin-top: 44px; }
 }
 
 ::selection { background: var(--lake); color: #fff; }
@@ -88,7 +98,7 @@ a { color: inherit; text-decoration: none; }
 }
 .nav-cta:hover { background: var(--lake); color: #fff !important; border-color: var(--lake); }
 
-main { max-width: 1060px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+main { max-width: 1060px; margin: 0 auto; padding: 0 32px; position: relative; }
 
 /* HERO */
 .hero { padding: 190px 0 120px; position: relative; overflow: hidden; }
@@ -289,7 +299,6 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 32px; position: relative; z
 
 footer {
   max-width: 1060px; margin: 24px auto 40px; padding: 0 32px;
-  position: relative; z-index: 1;
 }
 .footer-bar {
   background: var(--glass);
@@ -302,7 +311,7 @@ footer {
 .footer-bar .accent { color: var(--lake); }
 
 /* ARTICLE */
-.article { max-width: 720px; margin: 0 auto; padding: 170px 32px 90px; position: relative; z-index: 1; }
+.article { max-width: 720px; margin: 0 auto; padding: 170px 32px 90px; }
 .article-meta { font-family: var(--font-mono); font-size: 13px; color: var(--text-faint); margin-bottom: 20px; display: flex; gap: 12px; }
 .article h1 {
   font-family: var(--font-display); font-size: clamp(36px, 5vw, 54px); font-weight: 560;
