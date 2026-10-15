@@ -105,9 +105,9 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 32px; position: relative; z
   text-shadow: 0 2px 30px rgba(255, 255, 255, 0.6);
 }
 .hero h1 .accent { font-style: italic; font-weight: 480; color: var(--lake); }
-.hero-sub { font-size: 19px; color: #2b3a43; max-width: 640px; margin-bottom: 22px; text-shadow: 0 1px 16px rgba(250,251,248,0.95), 0 0 4px rgba(250,251,248,0.9); }
-.hero-sub strong { color: var(--ink); font-weight: 600; }
-.hero-meta { display: flex; gap: 12px; align-items: center; font-size: 13px; color: #43545e; margin-bottom: 36px; font-family: var(--font-mono); letter-spacing: 0.03em; text-shadow: 0 1px 12px rgba(250,251,248,0.95), 0 0 3px rgba(250,251,248,0.9); }
+.hero-sub { font-size: 19px; color: #f2f6f3; max-width: 640px; margin-bottom: 22px; text-shadow: 0 1px 3px rgba(26,33,16,0.6), 0 2px 20px rgba(26,33,16,0.5); }
+.hero-sub strong { color: #ffffff; font-weight: 600; }
+.hero-meta { display: flex; gap: 12px; align-items: center; font-size: 13px; color: #e6ede9; margin-bottom: 36px; font-family: var(--font-mono); letter-spacing: 0.03em; text-shadow: 0 1px 3px rgba(26,33,16,0.55), 0 2px 16px rgba(26,33,16,0.45); }
 .hero-meta .dot { color: var(--lake); }
 .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
 
