@@ -45,7 +45,7 @@ body::before { display: none; }
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   --muted-foreground: #768274;
 }
-#maple-mirrored-wave canvas { display: block; width: 100vw; height: 100vh; }
+#maple-mirrored-wave canvas { display: block; width: 100vw; height: 100vh; transform: scaleX(-1); }
 
 ::selection { background: var(--lake); color: #fff; }
 
