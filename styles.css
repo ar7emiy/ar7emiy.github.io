@@ -186,6 +186,7 @@ main { max-width: 1060px; margin: 0 auto; padding: 0 32px; }
 
 /* WRITING */
 .writing-list { display: flex; flex-direction: column; }
+.writing-sub { color: var(--text-dim); font-size: 15px; margin: -6px 0 30px; max-width: 640px; }
 .writing-item {
   display: grid; grid-template-columns: 110px 1fr 40px; gap: 24px; align-items: center;
   padding: 26px 10px; border-bottom: 1px solid var(--border);
