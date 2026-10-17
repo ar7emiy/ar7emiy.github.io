@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Predicting Wellness and Education Activity during Covid-19 using Bayesian Networks — Art Yalovenko</title>
+<meta name="description" content="Predicting Wellness and Education Activity during Covid-19 using Bayesian Networks">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=14">
+<style>
+.glass-panel pre{background:rgba(24,34,40,.92);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.6;color:#e9eff1;margin:18px 0}
+.glass-panel pre code{font-family:'JetBrains Mono',ui-monospace,monospace;background:none;padding:0;color:inherit}
+</style>
+</head>
+<body>
+<div id="maple-mirrored-wave" aria-hidden="true"><canvas id="scene-canvas"></canvas></div>
+<div class="grain"></div>
+<header class="nav">
+  <a href="../index.html" class="logo">AY<span class="accent">.</span></a>
+  <nav class="nav-links">
+    <a href="../index.html#projects">Projects</a>
+    <a href="../index.html#experience">Experience</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="../index.html#principles">Principles</a>
+    <a href="../index.html#contact" class="nav-cta">Contact</a>
+  </nav>
+</header>
+
+<article class="article">
+<div class="glass-panel">
+  <a href="../index.html#writing" class="back-link">← All writing</a>
+  <p class="article-meta"><span>Jul 2023</span><span>·</span><span>From Medium</span></p>
+  <h1>Predicting Wellness and Education Activity during Covid-19 using Bayesian Networks</h1>
+<h2>Overview of Data</h2>
+<p>The COVID-19 Pandemic has had a significant impact on our lives. Especially the education system. Due to which, online platform’s have become a common medium for students worldwide. This project aims to analyze the responses of a survey conducted among student’s to understand their experiences and their perspectives related to online classes during pandemic.</p>
+<p><strong>Dataset</strong> — https://www.kaggle.com/datasets/kunal28chaturvedi/covid19-and-its-impact-on-students</p>
+<p>It contains 1,182 rows and 19 columns, The columns include online class, self-study, fitness, sleep, social media, and TV as the continuous variables, rating of class experience and change in weight as ordinal variables, region, medium, and social media platform as categorical variables, and several binary variables, as well as two open-response variables that were manually reclassed to categories.</p>
+<h2>Non-Technical Summary of Analyses</h2>
+<h2>Background Analysis</h2>
+<p>During the analysis of the “covidSurvey ‘’ dataset, we renamed the columns, added tables for the categorical values for better understanding, and removed all the missing values. We ensured that the ordinal variables were correctly recast to numeric while retaining the response levels. We ensured all of our time variables were measured in hours, so no further transformation was needed.</p>
+<p>Looking at the initial histogram’s, we could see a right skew was present for many variables. We even performed visualization using scatterplot to check the trend between variables, but it was not useful as there was no clear trend in the pattern. Therefore, to combat this, we explored the option of log transforming our variables to scale our data.</p>
+<p>While performing log transformation, we performed additional log transformations for “classTime” and “tvTime” and then calculated the skewness of those values. With that we got to know that the distribution of “classTime” is moderately left-skewed, whereas the distribution of “tvTime” is approximately symmetric. We then performed visualizations using histograms for data with log transformation. They showed a very significant right skew across the majority of the data variables. The initial correlation plots for our variables are very weak. In order to improve inter-variable correlation we performed binning, log transformation, and binning on log transformed data. Log transformed data can be seen improving correlation by a small amount while also transforming the variable skewness (as seen in table of fig.101 and correlation plots from fig.102 and 103). These notions lead us to use the log transformed data across all our analyses with exception of Bayesian Networks analysis.</p>
+<h2>Linear Regression Analysis</h2>
+<p>The results of the linear regression analysis revealed several important findings. Initially, the fit of the model indicated potential violations of linearity and normality, as well as heteroscedasticity, suggesting varying residual dispersion across predictor values.</p>
+<p>The significant negative correlations were observed for sleepTime, Age, healthIssue, and missing-nothing variables, indicating that higher values in these variables were associated with decreased online class time. Conversely, studyTime and classRating showed positive correlations, indicating that higher values in these variables were linked to increased online class attendance.</p>
+<p>These findings were validated through cross-validation, which yielded consistent results. However, the overall accuracy of the model was found to be quite low at 10.37%, suggesting that it was not reliable. Despite attempts to address data skewness and preprocess variables, the limitations of linear regression in handling categorical and ordinal variables were evident. Therefore, it is recommended to explore alternative classification algorithms better suited for the dataset, considering the presence of such variables and the skewed nature of the data.</p>
+<h2>Bayesian Network Analysis</h2>
+<p>Bayesian networks (BN), or Bayesian Belief Network, are graphical models used in both supervised and unsupervised machine learning. They capture probabilistic relationships among variables and are commonly employed for modeling complex systems with uncertainty. Bayesian networks find application in various domains such as healthcare, finance, natural language processing, and computer vision, aiding in decision-making, risk assessment, pattern recognition, and prediction tasks.</p>
+<p>Bayesian Network is represented by a mathematical object called a network structure, denoted as G = (V, A). V refers to the set of nodes, such as v1, v2, …, vN, where N is the total number of nodes in the network. A represents the set of edges or arcs, which depict connections between nodes. The graph is uniquely defined by the combination of V and A. In a directed acyclic graph (DAG), the edges are directed from one node to another, denoted as,</p>
+<p>with the constraint that each pair of nodes is connected by only one edge.</p>
+<p>In a DAG, vi is referred to as the “parent” node, and vj as the “child” node. DAGs are acyclic, meaning they do not contain any loops or cycles. Loops refer to edges from a node to itself (vi → vi), while cycles represent sequences of edges that form closed loops, such as vi → vj → … → vk → vi. The DAG plays a crucial role in a BN by expressing the relationships between variables in terms of conditional independence. It represents the dependencies and independence assumptions among variables, where variables do not directly cause each other.</p>
+<p>Therefore, the DAG structure in a BN allows for the modeling of conditional independence relationships and aids in understanding the causal dependencies and dependencies between variables within the network.</p>
+<p>In a Bayesian network (BN), if two nodes are not connected by an edge, they are either independent or conditionally independent given some other nodes. This property, known as the local Markov property, states that the absence of a direct edge implies independence or conditional independence. The global Markov property is a stronger version, extending the local property to subsets of variables, where any two subsets are conditionally independent given a separating subset. The graphical separation in a BN implies probabilistic independence, represented by the formula</p>
+<p>probabilistic independence. Hence, a BN’s directed acyclic graph (DAG) serves as an independence map, illustrating the conditional independence relationships between nodes. <em>(for further explanation of how Markov Property allows for decomposition of a large model into smaller subsets given absence of cycles see the cited Briganti page 3–4).</em></p>
+<h2>Assumptions</h2>
+<h2>When using structure learning algorithms for Bayesian networks, certain key assumptions are made</h2>
+<ul>
+<li>The underlying structure being learned is a directed acyclic graph (DAG).</li>
+<li>There are no selection biases, latent variables, or confounding variables. All the common causes of measured variables are accounted for, known as causal sufficiency.</li>
+<li>Only variables that are d-separated in a DAG exhibit independence, while others are dependent, following the principle of causal faithfulness, which is the converse of the Markov property.</li>
+<li>Bayesian networks encode only conditional independencies, representing the sole type of relationships between random variables in X.</li>
+<li>Each node in the network represents a distinct random variable in X, ensuring that there are no multiple nodes that serve as deterministic functions of the same random variable, like a sum score of two variables.</li>
+<li>Observations should be independent realizations, allowing for unbiased estimation of probabilities.</li>
+<li>The global probability distribution P(X) must have strictly positive values, ensuring that all possible combinations of variable values in X represent observable events. This requirement guarantees the presence of uniquely determined Markov blankets and an identifiable model structure.</li>
+</ul>
+<h2>Note on the goal of the analysis and pre-processing</h2>
+<p>Our goal of the analysis was to analyze the relationship between wellness/healthy behavior (sleeping and fitness variable related), commitment to class (class time and study time variables), and distraction-based behavior (Time spent on Social Media and TV) between age groups 7–17 and 18–27.</p>
+<p>To achieve this we used a reduced number of variables(that the original 16 variable model) which were also merged to assess our objective question. Variables of time spent on class attendance and studying time were binned to represent the overall commitment to education during Covid lockdown. Variables of time spent on tv and on social media were binned to represent the overall destructive behavior via entertainment. The variables had to be binned and then casted as numeric factors.</p>
+<p>The factor distributions were the following (age in years, while sleep time, fitness, media time, and class time were in hours).</p>
+<pre><code class="language-r">&gt; summary(CovNumBin)ageBins     sleepTimeBin  fitnessBins   TTLmediaBin    classStudyBin7–17 :302    4–7.5 :484     0–1:1035    0–4.75 :914     0–7.3 :79918–27:790    7.8–11:645     2 : 118     5.0–9.5:233     7.5–14:364             12–15 : 50     4–5: 26     10–14.5: 32     15–22 : 16
+</code></pre>
+<p>It could be said that increasing bin values within sleep time, fitness, and class time are beneficial to wellness while increasing time spent on media does reverse according to study by Walsh of MIT. (Walsh)</p>
+<h2>Discovering the DAG and measuring node stability</h2>
+<p>Briganti of Harvard University writes: “For cross-sectional studies, it is desirable to study a “stable” network structure, that is, a set of edges and directions that is unlikely to vary. […] For partial correlation networks, one can use bootstrapping methods to evaluate the stability of network estimates (Epskamp et al., 2018). It is possible to directly account for stability in structure learning in a similar way: the same algorithm learns a sufficiently large number of BNs from bootstrap samples and we only consider edges that appear in a proportion of BNs higher than some threshold. Previous empirical papers (Briganti, Scutari, et al., 2020, 2021) only included edges that appeared in more than 85% of networks (this is called strength), and whose direction appeared in more than 50% of networks (this is called minimum direction). We recommend that researchers only report stable BNs obtained in this way, and that they should use 100–200 bootstrap samples to ensure the proportion of BNs in which each edge appears are estimated accurately.” (Briganti, 7)</p>
+<p><em>Network resulting using The IC algorithm which is implemented by the Peter &amp; Clark (PC) algorithm described by Briganti above:</em></p>
+<p>In addition to using the method described by Brigatti for ensuring goodness of fit we leverages a few other techniques for the assessment:</p>
+<p>The Hill-Climbing (HC) algorithm, as described, is a greedy search approach for exploring Directed Acyclic Graphs (DAGs) by making single-edge additions, removals, and reversals. (Britanti, 9)</p>
+<h2>Network resulting using Hill Climbing Algorithm</h2>
+<h2>Network resulting using Incremental Association</h2>
+<p>According to Briganti: <em>“A comprehensive simulation study showed that there were no systematic differences in performance or sensitivity to error in real-world data when comparing the three classes of learning algorithms (Scutari et al., 2018)”(Briganti, 10 )</em></p>
+<p>However, even though the stability algorithms pointed towards eliminating the assessment of the fitness variable, it was included in the final model. We leveraged the … as the backbone to support our inclusion of fitness into the model as the multitude of studies concluded: <em>“The strongest relationships have been found between aerobic fitness and performance in mathematics, reading, and English. For children in a school setting, regular participation in physical activity is particularly beneficial with respect to tasks that require working memory and problem solving. These findings are corroborated by the results of both authentic correlational studies and experimental randomized controlled trials.“ (Kohl III, Cook).</em></p>
+<p>Additionally, supported by studies published within National Library of Medicine regarding and concluding an overall negative effect of sleep within adolescents, young adult, and college students, we created a relationship between Media time and Sleep time (Garett, Liu,Young) (Levenson,Shensa, Sidani ,Colditz , Primack) (Pirdehghan, Khezmeh, Panahi).</p>
+<h2>Network that was analyzed using Bayesian Belief network</h2>
+<h2>Evaluation of Results</h2>
+<p>As mentioned earlier, the goal of the developed bayesian belief network is to assess the relationship of wellness behavior (sleeping and fitness related), commitment to class (class time and study time), and distraction-based behavior (Time spent on Social Media and TV) between age groups 7–17 and 18–27. Figure 321 provides conditional probability tables based on multinomial distribution for assessing the behavioral factors for ages of 7–17. Figure 322 provides conditional probability tables for age group of 18–27.</p>
+<p>Looking at results in Fig.321 we can derive the following insights:</p>
+<ul>
+<li>As sleep time increases the chances of increased fitness given any level of class commitment time generally increase for the age group of 7–17. At the same time as sleep time increases the chance of higher class commitment given any level of fitness lowers. Low sleep and increasing media time had mixed results due to progressively decreasing observations within high class attendance and high fitness time groups.</li>
+<li>From parameters of node sleepTimeBin, it is statistically more likely that teenagers sleep between 7.5–14 hours. Interestingly there is a sign that as media time decreases there is a higher chance of sleeping less among the teenage population. This is contrary to the general belief and contrary to the conclusion in studies such as one done by Pirdehghan on “Social Media Use and Sleep Disturbance among Adolescents”. Further research and assistance of subject-matter experts is required.</li>
+</ul>
+<p>Looking at Fig.322 we can derive the following insights:</p>
+<ul>
+<li>Assessing the parameters of node explaining class/study time we can derive that as as sleep increased among adults before 30, given that social media time stayed at 0–4.75 hours a week level, time spent on fitness progressively increased. Meanwhile, as sleep time increased, time spent on the class decreased. Within this age group, the highest cumulative chance of a person spending most time on class (between 7.5–14 hours) and most time on fitness (between 4–5 hours) was given that the person spends between 4.5–7 hours on sleep and 0–4.5 hours on media. We can also derive that as time on media increased chances of spending more time on the online class decreased. While those that spent a small amount sleeping and most amount on media, as well as those that spend most amount of time sleeping and on social media were guaranteed to be in the lowest groups in class and fitness attendance.</li>
+<li>Looking at the parameters of node explaining time spent on sleep we can derive that given any media time young adults were most likely to sleep between 7.8–11 hours. Interestingly, highest chance of lowest sleep time was given when persons spent least time on social media (40.2%); this could potentially indicate that they could’ve been occupied with other tasks or suffered a health issue.</li>
+</ul>
+<pre><code class="language-r">fittedBN1 &gt; fittedBN1
+</code></pre>
+<pre><code class="language-r">Bayesian network parameters
+</code></pre>
+<pre><code class="language-r">Parameters of node classStudyBin (multinomial distribution)
+</code></pre>
+<pre><code class="language-r">Conditional probability table: , , sleepTimeBin = 1, TTLmediaBin = 1
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin          1          2          3            1 0.42391304 0.30769231 0.60000000            2 0.53260870 0.69230769 0.40000000            3 0.04347826 0.00000000 0.00000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 2, TTLmediaBin = 1
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin          1          2          3            1 0.61538462 0.90000000 0.66666667            2 0.38461538 0.10000000 0.33333333            3 0.00000000 0.00000000 0.00000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 3, TTLmediaBin = 1
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin          1          2 3            1 0.75000000 0.50000000              2 0.25000000 0.50000000              3 0.00000000 0.00000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 1, TTLmediaBin = 2
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin          1          2          3            1 0.45454545 1.00000000 1.00000000            2 0.45454545 0.00000000 0.00000000            3 0.09090909 0.00000000 0.00000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 2, TTLmediaBin = 2
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin          1          2          3            1 0.80000000 0.33333333 0.50000000            2 0.16000000 0.66666667 0.50000000            3 0.04000000 0.00000000 0.00000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 3, TTLmediaBin = 2
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin          1 2 3            1 0.50000000                2 0.50000000                3 0.00000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 1, TTLmediaBin = 3
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin          1 2 3            1 0.50000000                2 0.50000000                3 0.00000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 2, TTLmediaBin = 3
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin          1 2 3            1 0.66666667                2 0.33333333                3 0.00000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 3, TTLmediaBin = 3
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin 1 2 3            1                  2                  3
+</code></pre>
+<pre><code class="language-r">Parameters of node sleepTimeBin (multinomial distribution)
+</code></pre>
+<pre><code class="language-r">Conditional probability table:             TTLmediaBinsleepTimeBin          1          2          3           1 0.44000000 0.31914894 0.40000000           2 0.52000000 0.63829787 0.60000000           3 0.04000000 0.04255319 0.00000000
+</code></pre>
+<pre><code class="language-r">Parameters of node TTLmediaBin (multinomial distribution)
+</code></pre>
+<pre><code class="language-r">Conditional probability table:          1          2          3 0.82781457 0.15562914 0.01655629
+</code></pre>
+<pre><code class="language-r">&gt; fittedBN2 &gt; fittedBN2
+</code></pre>
+<pre><code class="language-r">Bayesian network parameters
+</code></pre>
+<pre><code class="language-r">Parameters of node classStudyBin (multinomial distribution)
+</code></pre>
+<pre><code class="language-r">Conditional probability table: , , sleepTimeBin = 1, TTLmediaBin = 1
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin           1           2           3            1 0.536231884 0.535714286 0.333333333            2 0.429951691 0.464285714 0.666666667            3 0.033816425 0.000000000 0.000000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 2, TTLmediaBin = 1
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin           1           2           3            1 0.757679181 0.793103448 0.833333333            2 0.235494881 0.206896552 0.166666667            3 0.006825939 0.000000000 0.000000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 3, TTLmediaBin = 1
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin           1           2           3            1 0.952380952 1.000000000 1.000000000            2 0.047619048 0.000000000 0.000000000            3 0.000000000 0.000000000 0.000000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 1, TTLmediaBin = 2
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin           1           2           3            1 0.822222222 0.875000000 1.000000000            2 0.177777778 0.125000000 0.000000000            3 0.000000000 0.000000000 0.000000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 2, TTLmediaBin = 2
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin           1           2           3            1 0.795918367 0.750000000 1.000000000            2 0.204081633 0.250000000 0.000000000            3 0.000000000 0.000000000 0.000000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 3, TTLmediaBin = 2
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin           1           2 3            1 1.000000000 1.000000000              2 0.000000000 0.000000000              3 0.000000000 0.000000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 1, TTLmediaBin = 3
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin           1 2 3            1 1.000000000                2 0.000000000                3 0.000000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 2, TTLmediaBin = 3
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin           1           2           3            1 0.818181818 0.000000000 1.000000000            2 0.181818182 1.000000000 0.000000000            3 0.000000000 0.000000000 0.000000000
+</code></pre>
+<pre><code class="language-r">, , sleepTimeBin = 3, TTLmediaBin = 3
+</code></pre>
+<pre><code class="language-r">fitnessBinsclassStudyBin           1 2 3            1 1.000000000                2 0.000000000                3 0.000000000
+</code></pre>
+<pre><code class="language-r">Parameters of node sleepTimeBin (multinomial distribution)
+</code></pre>
+<pre><code class="language-r">Conditional probability table:             TTLmediaBinsleepTimeBin          1          2          3           1 0.40202703 0.31791908 0.32000000           2 0.55405405 0.64739884 0.52000000           3 0.04391892 0.03468208 0.16000000
+</code></pre>
+<pre><code class="language-r">Parameters of node TTLmediaBin (multinomial distribution)
+</code></pre>
+<pre><code class="language-r">Conditional probability table:          1          2          3 0.74936709 0.21898734 0.03164557
+</code></pre>
+<h2>Code used for this paper</h2>
+<pre><code class="language-r">#Code used to fit a linear regression model #(as well as Elastic net which wasn't included in the paper because of violated assumptions)
+</code></pre>
+<pre><code class="language-r"># REGRESSIONS (OLS, and Elastic Net)*plotting initial OLS fit*{r echo=TRUE}OLS.init summary(OLS.init)
+</code></pre>
+<pre><code class="language-r">OLS.init2 summary(OLS.init2)
+</code></pre>
+<pre><code class="language-r">vif(OLS.init) #no multicollinearity confirmed#0.1 R2 with 8 significant variables.
+</code></pre>
+<pre><code class="language-r">par(mfrow = c(2,2))plot(OLS.init)plot(OLS.init2)par(mfrow = c(1,1))
+</code></pre>
+<pre><code class="language-r">*OLS with data_log*{r echo=TRUE}OLS.init3 summary(OLS.init3)vif(OLS.init3)
+</code></pre>
+<pre><code class="language-r">OLS.init4 summary(OLS.init4)
+</code></pre>
+<pre><code class="language-r">vif(OLS.init3) #no multicollinearity confirmed#0.1 R2 with 8 significant variables. par(mfrow = c(2,2))plot(OLS.init3)plot(OLS.init4)par(mfrow = c(1,1))
+</code></pre>
+<pre><code class="language-r">Doing an all subsets regression{r echo=TRUE}library(caret)ctrl &lt;- trainControl(method = &quot;cv&quot;, number = 10)
+</code></pre>
+<pre><code class="language-r">#fit a regression model and use k-fold CV to evaluate performancemodel model$finalModelmodel$resample
+</code></pre>
+<pre><code class="language-r">trainCovid testCovid &lt;- data_log[!sample,-c(4)]
+</code></pre>
+<pre><code class="language-r">train_preds test_preds &lt;- predict(model, testCovid)
+</code></pre>
+<pre><code class="language-r"># Calculate the training and testing set RMSEstrain_rmse test_rmse &lt;- sqrt(mean((data_log$classTime - test_preds)^2))
+</code></pre>
+<pre><code class="language-r"># Print the resultscat(&quot;Training set RMSE:&quot;, train_rmse, &quot;\n&quot;)cat(&quot;Testing set RMSE:&quot;, test_rmse, &quot;\n&quot;)
+</code></pre>
+<pre><code class="language-r">coefficients p_values |t|)&quot;]
+</code></pre>
+<pre><code class="language-r"># Combine the coefficient estimates and p-values into a data frameresults &lt;- data.frame(Coefficient = coefficients, `p-value` = p_values)
+</code></pre>
+<pre><code class="language-r"># Print the resultsprint(results)
+</code></pre>
+<pre><code class="language-r">print(model)
+</code></pre>
+<pre><code class="language-r">*fitting an alpha to an elastic plot.*{r echo= TRUE}sample trainCovid testCovid &lt;- data_log[!sample,-c(4,16)]
+</code></pre>
+<pre><code class="language-r">xTrain.d1yTrain.d1&lt;- as.matrix(trainCovid[,c(2)])
+</code></pre>
+<pre><code class="language-r">xTest.d1 yTest.d1
+</code></pre>
+<pre><code class="language-r">set.seed(17289)
+</code></pre>
+<pre><code class="language-r">alphaBest = 0bestError = 9999999    # Start out with a huge errorfor (alpha in seq(0, 1, .1)){  meanError = 0  for (i in 1:50)  {    # Grab test and training sets    fitElastic.vid = cv.glmnet(xTrain.d1, yTrain.d1, alpha=alpha, nfolds=10,                                  grouped = FALSE)    elasticPred = predict(fitElastic.vid, xTest.d1, s=&quot;lambda.1se&quot;)    meanError = meanError + sqrt(mean((elasticPred - yTest.d1)^2))  }  meanError = meanError / 100    if (meanError   {    alphaBest = alpha    bestError = meanError  }}print(&quot;Best alpha is: &quot;)print(alphaBest) #gave it as 0print(&quot;Gives mean test error: &quot;)print(bestError) #very little overfitting
+</code></pre>
+<pre><code class="language-r">#running with best alpha
+</code></pre>
+<pre><code class="language-r">lamRange = seq(0,3,0.1)
+</code></pre>
+<pre><code class="language-r">Best.eNet &lt;- cv.glmnet(xTrain.d1, yTrain.d1, alpha=0.0, nfolds = 7, grouped = FALSE)
+</code></pre>
+<pre><code class="language-r">elasticPred.test = predict(Best.eNet, xTest.d1, s=&quot;lambda.1se&quot;)elasticPred.train =  predict(Best.eNet, xTrain.d1, s=&quot;lambda.1se&quot;)
+</code></pre>
+<pre><code class="language-r">rmse.elasticTest = sqrt(mean((elasticPred.test - yTest.d1)^2))rmse.elasticTrain = sqrt(mean((elasticPred.train - yTrain.d1)^2))
+</code></pre>
+<pre><code class="language-r">rmse.elasticTrainrmse.elasticTest
+</code></pre>
+<pre><code class="language-r">elasticPred.test = predict(model, xTest.d1)elasticPred.train =  predict(model, xTrain.d1)
+</code></pre>
+<pre><code class="language-r">rmse.elasticTest = sqrt(mean((elasticPred.test - yTest.d1)^2))rmse.elasticTrain = sqrt(mean((elasticPred.train - yTrain.d1)^2))
+</code></pre>
+<pre><code class="language-r">rmse.elasticTrainrmse.elasticTest
+</code></pre>
+<pre><code class="language-r">Best.eNet#very little overfitting! but HOW???
+</code></pre>
+<pre><code class="language-r">#checking lasso to confirm we cant have penalized regressionBestELasso plot(BestELasso)BestELasso
+</code></pre>
+<pre><code class="language-r">plot(Best.eNet)
+</code></pre>
+<pre><code class="language-r">Best.eNet$lambda.1se
+</code></pre>
+<pre><code class="language-r">################Code used to fit the Bayesian model in this paper:############
+</code></pre>
+<pre><code class="language-r">res3 = model2network(&quot;[ageBins]                     [fitnessBins]                     [TTLmediaBin]                     [PersonConnection]                     [healthIssue]                     [classRating]                     [sleepTimeBin]                     [studyBin][classBin|TTLmediaBin:fitnessBins:ageBins:healthIssue:PersonConnection:classRating:sleepTimeBin:studyBin]&quot;)
+</code></pre>
+<pre><code class="language-r">res4 = model2network(&quot;[fitnessBins][TTLmediaBin][healthIssue|sleepTimeBin:fitnessBins:TTLmediaBin][sleepTimeBin|classBin:fitnessBins][classBin|TTLmediaBin]&quot;)
+</code></pre>
+<pre><code class="language-r">plot(res)fittedBN fittedBN
+</code></pre>
+<pre><code class="language-r">plot(res2)fittedBN fittedBN
+</code></pre>
+<pre><code class="language-r">plot(res3)fittedBN fittedBN
+</code></pre>
+<pre><code class="language-r">#network setup / Goodness of fit confirmation
+</code></pre>
+<pre><code class="language-r">VarRelX plot(VarRelX)
+</code></pre>
+<pre><code class="language-r">BST # compute the edge strengthsavgnet1 # compute the average network
+</code></pre>
+<pre><code class="language-r">plot(avgnet1)
+</code></pre>
+<pre><code class="language-r">BNpc &lt;- pc.stable(CovNumBinBN[,c(8,9,10,11)])
+</code></pre>
+<pre><code class="language-r">plot(BNpc)
+</code></pre>
+<pre><code class="language-r">#res6
+</code></pre>
+<pre><code class="language-r">BNgs # this performs the GS algorithmBNiamb # this performs the IAMB algorithm
+</code></pre>
+<pre><code class="language-r">#set network directions manuallyres5 = model2network(&quot;[fitnessBins|TTLmediaBin][TTLmediaBin][sleepTimeBin|TTLmediaBin][classStudyBin|TTLmediaBin:fitnessBins:sleepTimeBin]&quot;)
+</code></pre>
+<pre><code class="language-r">plot(res5)
+</code></pre>
+<pre><code class="language-r">#visualization of Bayesian Network
+</code></pre>
+<pre><code class="language-r">bnviewer::viewer(res5,       bayesianNetwork.width = &quot;100%&quot;,       bayesianNetwork.height = &quot;80vh&quot;,       bayesianNetwork.layout = &quot;layout_with_sugiyama&quot;,       bayesianNetwork.title=&quot;Covid-19 Education Survey Network&quot;,       bayesianNetwork.footer = &quot;Fig. 1 - Layout with Sugiyama&quot;)
+</code></pre>
+<pre><code class="language-r">#the conditional probabilities and overview of filterered data
+</code></pre>
+<pre><code class="language-r"># plot(res4)# fittedBN # fittedBN
+</code></pre>
+<pre><code class="language-r">filtered_dataset1 % filter(ageBins == &quot;1&quot;)summary(filtered_dataset1[,c(8,9,10,11)])  plot(res5)fittedBN1 fittedBN1
+</code></pre>
+<pre><code class="language-r">filtered_dataset2 % filter(ageBins == &quot;2&quot;)summary(filtered_dataset2[,c(8,9,10,11)])  #plot(res5)fittedBN2 fittedBN2
+</code></pre>
+<pre><code class="language-r">#goodness of fit
+</code></pre>
+<pre><code class="language-r">BST # compute the edge strengthsavgnet1 # compute the average networkastr1 # compute edge strengths
+</code></pre>
+<pre><code class="language-r">graphviz.chart(  fittedBN1,  type = &quot;barprob&quot; ,  layout = &quot;neato&quot;,  grid = TRUE,  bar.col = &quot;darkgreen&quot;,  main = &quot;Conditional Probabilites of BN analysis&quot;,  sub = &quot;Data based on Adolenscent propulation&quot;)
+</code></pre>
+<pre><code class="language-r">graphviz.chart(  fittedBN2,  type = &quot;barprob&quot; ,  layout = &quot;neato&quot;,  grid = TRUE,  bar.col = &quot;darkgreen&quot;,  main = &quot;Conditional Probabilites of BN analysis&quot;,  sub = &quot;Data based on young adults propulation&quot;)
+</code></pre>
+<h2>Bayesian Networks citations</h2>
+<ul>
+<li>*Briganti, Giovanni, et al. “A Tutorial on Bayesian Networks for Psychopathology Researchers.” Psychological Methods, 2022, *<a href="https://doi.org/10.1037/met0000479.">https://doi.org/10.1037/met0000479.</a></li>
+<li>*Levenson, Jessica C., et al. “The Association between Social Media Use and Sleep Disturbance among Young Adults.” Preventive Medicine, vol. 85, 2016, pp. 36–41, *<a href="https://doi.org/10.1016/j.ypmed.2016.01.001.">https://doi.org/10.1016/j.ypmed.2016.01.001.</a></li>
+<li>*Garett, Renee, et al. “The Relationship between Social Media Use and Sleep Quality among Undergraduate Students.” Information, Communication &amp; Society, vol. 21, no. 2, 2016, pp. 163–173, *<a href="https://doi.org/10.1080/1369118x.2016.1266374.">https://doi.org/10.1080/1369118x.2016.1266374.</a></li>
+<li>*Pirdehghan, A., et al. “[PDF] Social Media Use and Sleep Disturbance among Adolescents: A Cross-Sectional Study: Semantic Scholar.” Iranian Journal of Psychiatry, 1 Jan. 1970, *<a href="http://www.semanticscholar.org/paper/Social-Media-Use-and-Sleep-Disturbance-among-A-Pirdehghan-Khezmeh/96b2850cb488cfb0164825f0577125d2538271ff.">www.semanticscholar.org/paper/Social-Media-Use-and-Sleep-Disturbance-among-A-Pirdehghan-Khezmeh/96b2850cb488cfb0164825f0577125d2538271ff.</a></li>
+<li>*Yuan, Ying, and Valen E Johnson. “Goodness-of-Fit Diagnostics for Bayesian Hierarchical Models.” Biometrics, Mar. 2012, *<a href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3276744/.">www.ncbi.nlm.nih.gov/pmc/articles/PMC3276744/.</a></li>
+<li><em>Hackerman, David. At — University of Pennsylvania, <em><a href="http://www.cis.upenn.edu/~mkearns/papers/barbados/heckerman.pdf.">www.cis.upenn.edu/~mkearns/papers/barbados/heckerman.pdf.</a></em> Accessed 8 June 2023.</em></li>
+<li>*Murphy, Kevin. “A Brief Introduction to Graphical Models and Bayesian Networks.” Graphical Models, 1998, *<a href="http://www.cs.ubc.ca/~murphyk/Bayes/bnintro.html.">www.cs.ubc.ca/~murphyk/Bayes/bnintro.html.</a></li>
+<li><em>Roweis, Sam. A Unifying Review of Linear Gaussian Models — New York University, cs.nyu.edu/~roweis/papers/NC110201.pdf. Accessed 8 June 2023.</em></li>
+<li><em>Walsh, Dylan. “Study: Social Media Use Linked to Decline in Mental Health.” MIT Sloan, 14 Sept. 2022,mitsloan.mit.edu/ideas-made-to-matter/study-social-media-use-linked-to-decline-mental-health</em></li>
+<li><em>Goodyear, Victoria A., et al. “The Effect of Social Media Interventions on Physical Activity and Dietary Behaviours in Young People and Adults: A Systematic Review — International Journal of Behavioral Nutrition and Physical Activity.” BioMed Central, 5 June 2021, ijbnpa.biomedcentral.com/articles/10.1186/s12966–021–01138–3.</em></li>
+<li>*Rohmer, Jeremy. “Uncertainties in Conditional Probability Tables of Discrete Bayesian Belief Networks: A Comprehensive Review.” Engineering Applications of Artificial Intelligence, vol. 88, 2020, p. 103384, *<a href="https://doi.org/10.1016/j.engappai.2019.103384.">https://doi.org/10.1016/j.engappai.2019.103384.</a></li>
+<li>*Kohl III , Harold W., and Heather D. Cook, editors. “Educating the Student Body: Taking Physical Activity and Physical Education to School.” Committee on Physical Activity and Physical Education in the School Environment; Food and Nutrition Board; Institute of Medicine, 2013, *<a href="https://doi.org/10.17226/18314.">https://doi.org/10.17226/18314.</a></li>
+<li>*Rohmer, Jeremy. “Uncertainties in Conditional Probability Tables of Discrete Bayesian Belief Networks: A Comprehensive Review.” Engineering Applications of Artificial Intelligence, vol. 88, 2020, p. 103384, *<a href="https://doi.org/10.1016/j.engappai.2019.103384.">https://doi.org/10.1016/j.engappai.2019.103384.</a></li>
+</ul>
+<p>Exploratory, data preprocessing and certain overview of content not related to the Bayesian network or Linear Regression model building was done with significant collaboration of:</p>
+<p><em>ALEXANDRA MISCHOU</em></p>
+<p><em>ARTEMIY YALOVENKO (This is me)</em></p>
+<p><em>ARELI MUÑOZ</em></p>
+<p><em>HARNAIN KAUR SARDARNI</em></p>
+  <p style="color:var(--text-faint);font-size:14px;">Originally published on <a href="https://medium.com/@yalovenko.artem/education-dataset-model-building-using-bayesian-network-in-r-dd77f5e6fafb" target="_blank" rel="noopener" style="color:var(--text-faint);">Medium</a>.</p>
+</div>
+</article>
+
+<footer>
+  <p>© 2026 Art Yalovenko · Built by hand, shipped with intent.</p>
+</footer>
+<script src="../autumn-bg.js?v=3"></script>
+</body>
+</html>
