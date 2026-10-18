@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekday AI Research Screener · Oct 18, 2026 · Art Yalovenko</title>
+<meta name="description" content="Research notes on GNN fraud detection and what it means for insurance product work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=14">
+</head>
+<body>
+<div id="maple-mirrored-wave" aria-hidden="true"><canvas id="scene-canvas"></canvas></div>
+<div class="grain"></div>
+<header class="nav">
+  <a href="../index.html" class="logo">AY<span class="accent">.</span></a>
+  <nav class="nav-links">
+    <a href="../index.html#projects">Projects</a>
+    <a href="../index.html#experience">Experience</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="../index.html#contact" class="nav-cta">Contact</a>
+  </nav>
+</header>
+
+<article class="article">
+<div class="glass-panel">
+  <a href="../index.html#writing" class="back-link">← All writing</a>
+  <p class="article-meta"><span>Oct 18, 2026</span><span>·</span><span>Research screener</span></p>
+  <h1>Weekday AI Research Screener</h1>
+  <p>A short one this week. Three of the four papers in this screener (TopoGraphRAG-Bench, InsClaimBench, Keep Your Receipts) were already covered on October 14, and none of them added anything new, so they are cut. New rule going forward: no repeats without new substance.</p>
+
+  <h2>1. Evi-VN <span style="font-size:15px;color:var(--text-faint)">(arXiv, Oct 2026)</span></h2>
+  <p>Fraudsters camouflage by blending into legitimate neighborhoods, and it turns out many GNN architectures share the same hard-region errors. The naive fix is to fuse in more evidence everywhere, text, images, records, but that disturbs the nodes your graph already handles well. Evi-VN instead identifies the shared hard regions across diverse GNNs and injects heterogeneous evidence only into likely hard samples, via virtual class nodes. The evidence arrives as chains connecting behavior, content, and context. It is designed as a corrector: your existing GNN keeps its input design and its reliable predictions, and the injection only touches the uncertain region. Tested on bot detection, fake reviews, refund evidence, and telecom fraud, with gains even when the evidence models are imperfect.</p>
+  <p>What I'd steal: insurance fraud graphs are exactly this setting. Claimants, providers, vehicles, addresses, bank accounts, prior claims, all heterophilic and camouflaged. The failure mode I keep seeing is either missing the non-graph evidence that reveals a ring, or contaminating clean nodes with noisy multimodal features. The selective pattern is the thing worth taking: keep the production GNN intact and enrich only the hard region. To transfer it you need a reliable hard-region detector on your own graph, and the extra evidence (adjuster notes, medical records, images) has to be isolatable into feature chains without leaking into the clean majority. Without those two, you are back to blanket fusion.</p>
+
+  <h2>Skipped this week</h2>
+  <p>EXL's GraphSAGE-style fraud embeddings, reportedly 27 to 33% relative lift at fixed alert rates with 3.1ms P99. Hot in vendor channels, but no public methodology, ablations, or open data. A commercial existence proof, not a research signal.</p>
+
+  <p style="color:var(--text-faint);font-size:14px;">Sources: arXiv preprint (Evi-VN 2610.11665). Cut under the no-repeat rule: TopoGraphRAG-Bench, InsClaimBench, Keep Your Receipts (all covered Oct 14).</p>
+</div>
+</article>
+
+<footer>
+  <p>© 2026 Art Yalovenko · Built by hand, shipped with intent.</p>
+</footer>
+<script src="../autumn-bg.js?v=3"></script>
+</body>
+</html>
