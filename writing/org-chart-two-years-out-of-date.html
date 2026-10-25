@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Org Chart Is Two Years Out of Date · Art Yalovenko</title>
+<meta name="description" content="We all need to become product engineers. A leadership op-ed on role structures built for an era that ended in 2024, with the evidence and the questions I am still sitting with.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=14">
+</head>
+<body>
+<div id="maple-mirrored-wave" aria-hidden="true"><canvas id="scene-canvas"></canvas></div>
+<div class="grain"></div>
+<header class="nav">
+  <a href="../index.html" class="logo">AY<span class="accent">.</span></a>
+  <nav class="nav-links">
+    <a href="../index.html#projects">Projects</a>
+    <a href="../index.html#experience">Experience</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="../index.html#contact" class="nav-cta">Contact</a>
+  </nav>
+</header>
+
+<article class="article">
+<div class="glass-panel">
+  <a href="../index.html#writing" class="back-link">← All writing</a>
+  <p class="article-meta"><span>Oct 25, 2026</span><span>·</span><span>Essay</span></p>
+  <h1>The Org Chart Is Two Years Out of Date</h1>
+  <p>We all need to become product engineers (and I would be happy to become one). I have had this thought for a while. And I have been hoping to structure teams this way one day. Watching Laurie Voss, who co-founded npm and now runs developer relations at Arize, say the same thing in his talk "AI Writes the Code. So What's Left for Engineers?" is what finally pushed me to write it down. This is my argument, not a summary of his talk. Where I use his material I say so, and where I go beyond it, that is my take.</p>
+
+  <h2>The break</h2>
+  <p>Our default role structures were built for an era when writing code was the scarce skill. It made sense then to split the work across a BA, a UX designer, a UI designer, an engineer, a product owner, and a product manager, with ticket writing and ticket management gluing it all together. That era ended in 2024. Copilot previewed in 2021 and ChatGPT arrived in late 2022, but those made code cheaper, not free. The decisive break was 2024, when Devin, Copilot Workspace, Replit Agent, and Bolt.new moved the unit of work from lines and files to whole tasks handed to an agent. By late 2024, writing code had stopped being the scarce skill. Companies that still organize as if it were are not early to this shift. They are two years late to it.</p>
+
+  <h2>The constraint argument</h2>
+  <p>The frame that makes this click is the theory of constraints. Fix one bottleneck and the next appears. When code was scarce, the org chart correctly optimized for producing it. Now code is effectively free, and the scarce skill is deciding what to build and what counts as good. That work lives with customers, not in training data. So the roles built around the old scarcity are now mostly handoff queues where context dies. Every handoff between a BA, a designer, an engineer, and a product manager is a queue where the spec gets thinner and the wait gets longer. Celebrating output volume in 2026 is like celebrating typing speed after the printing press: it measures a constraint that no longer exists.</p>
+  <p>The numbers behind this are unusually consistent across independent studies. An MIT and Wharton study of over 100,000 GitHub developers found synchronous agents produced a 741% increase in lines of code and a 65% increase in pull requests, but software releases rose only about 20%. A separate Harvard firm level study across 718 firms and 725,000 workers found lines of code per worker rose about 30% with no statistically significant increase in shipped work, while PR merge time rose 49%, review comments per PR rose 35%, and the share of workers doing review rose 14%. The authors say it plainly: code review becomes the bottleneck. Even with AI review tools at 80% of firms by March 2026, only 23% of review comments were AI generated. The tools did not remove the human constraint. Google's DORA 2024 report points the same way: every 25% increase in AI adoption correlated with a 1.5% decrease in delivery throughput and a 7.2% decrease in delivery stability, while 75% of developers reported feeling more productive. The perception gap is part of the story. METR's 2025 randomized trial found experienced developers took 19% longer on real tasks with AI while believing they were 20% faster, with 9% of their time going to reviewing or cleaning AI output. A 2026 rerun flipped the sign but with a confidence interval so wide that METR itself says the new number is barely usable, so I treat METR as contested evidence, not settled fact. The firm level studies are the load bearing ones.</p>
+
+  <h2>The product engineer</h2>
+  <p>What we need instead is the product engineer: someone who sits with a baker for a week, or in my case a claims adjuster or SIU investigator, and comes back with a spec, who does the elicitation, the experience thinking, the building, and the PROTOTYPING to validate the specs iteratively. The caps are deliberate. A spec that is never prototyped is a document thrown over a wall, and the loop, spec, prototype, validate, revise, is the job. Not the document. And the ticket machine, the writing and tracking and chasing of tickets, goes to agents, because that is structured work and agents are good at structured work. To be precise about something I got wrong in an earlier draft of this argument: I do not mean the whole project manager role gets automated. I mean ticket writing and ticket management. The project manager who does stakeholder judgment, escalation, and accountability stays. The ticket board as a full time human job does not.</p>
+  <p>This is also where the business analyst question resolves, at least in my view. The BA who only documents requirements gets squeezed between product engineers and agents, because drafting is exactly what agents do well. The BA who moves toward defining value, resolving ambiguous or conflicting requirements, and owning the spec becomes central, because that is the scarce work. In insurance this is concrete leverage. A BA who deeply knows claims workflows, SIU processes, and regulatory constraints is the person who can write specs an agent can actually build from correctly. The product engineer and the BA converge on the same skill, and companies that reskill BAs upward will have an advantage over companies that automate them away.</p>
+
+  <h2>The cost of not acting</h2>
+  <p>IBM is already acting on it. In February 2026, IBM announced plans to triple US entry level hiring, with roles rewritten away from routine coding toward customer engagement and AI oversight. Their chief HR officer said it directly: the entry level jobs from two to three years ago, AI can do most of them, so the jobs have to be totally different jobs. Dropbox expanded internships and new graduate programs by 25% on similar logic, citing younger workers' fluency with AI tools as an asset rather than a redundancy risk. Voss's talk adds the supporting anecdotes: GitHub Copilot now does more than one in five reviews on GitHub, OpenAI tells staff humans may review pull requests but are not required, and failures when review was skipped include a six month no review experiment he called a disaster and agent slop outages that pushed Amazon to require senior sign off.</p>
+  <p>And the cost of not acting is visible. Stanford payroll data shows employment for developers aged 22 to 25 down nearly 20% from its late 2022 peak. SignalFire puts new graduate hiring at the largest tech companies down about 65% since 2019. Computer engineering graduates face around 7.5% unemployment. A cohort trained for a craft that got automated is sitting without jobs while demand for the new skill goes completely unmet. Voss puts the human version of this bluntly: a $250k forward deployed engineer is cheaper to grow than to buy, and companies that do not grow their own will be stuck with vast demand completely unaddressed. My interpolation, not his: the junior pipeline is not a charity case. It is the cheapest available supply of future product engineers, and the companies that figure out how to convert it first will have a hiring advantage that compounds.</p>
+
+  <h2>How to tell if your team is stuck (my diagnostic, not Voss's)</h2>
+  <p>Here is a question I keep coming back to, and it is mine, not Voss's. If you are in an environment where developers make you feel like writing code is the scarce resource, should we flag that early? My answer is: flag it as a hypothesis, then verify it through actual development behavior, because the mindset is wrong in most product teams today but right in some scenarios. How to tell: if output is up but shipped work is flat and the review queue keeps growing, the constraint is review and the mindset is outdated. If merge times are lengthening and PRs keep coming back for changes, same verdict. But if the code is novel, legacy, or regulated, or if rework comes from specs changing rather than code being slow, then code really is the hard part and the flag would be wrong. Look at the evidence, not the vibes. The metrics to check are output versus shipped work, PR merge time, review queue age, send back rate, and the source of rework. A team celebrating output while its review queue grows is optimizing a constraint that stopped existing two years ago.</p>
+
+  <h2>Top down change (my interpolation)</h2>
+  <p>My view, and the part I am least sure about, is that this change has to be driven top down, because no individual team can rewrite job ladders on its own. The levers available to leadership, in the order I would try them, are: first, job descriptions, because they define what gets hired; second, promotion criteria, because they define what gets rewarded; third, team structure, because small product engineer teams with agents beat large handoff chains; fourth, retraining budgets, because the junior cohort already exists and needs conversion, not replacement. The blocker is not technology. It is middle management incentives that still reward the old structure: output volume, headcount, ticket throughput. Until those incentives change, every bottom up attempt will be measured against the old scoreboard and found wanting. This is also why I expect the best answers to the questions below to arrive privately rather than in public comments. Leaders will discuss principles and past lessons openly, but current reorg plans, headcount moves, and timelines are things nobody sensible posts on LinkedIn. That is not cowardice. It is their employees reading over their shoulder.</p>
+
+  <h2>Questions I am still sitting with</h2>
+  <p>These are my questions, not Voss's, and I would rather hear disagreement than agreement.</p>
+  <p><strong>Core:</strong> What is the actual answer to getting development defined correctly and efficiently for the company? What does "defined correctly" even mean in practice, and who gets to decide what counts as good?</p>
+  <p><strong>Top down change:</strong> How do you make this change top down in a large company, and what is the first lever? How do you get a very nimble HR and hiring policy that is somehow hyper adaptable to the times, and how is that even possible in a corporate setting at large scale? How do you retrain and rehire toward product engineers at scale, and quickly, when it should have been done two years ago?</p>
+  <p><strong>Diagnostic:</strong> Should we flag the code scarcity mindset early, and what is the specific test for whether it is wrong or right in a given team?</p>
+  <p><strong>Roles:</strong> What happens to business analysts, and does UX and UI design fold into the product engineer or stay separate while the product engineer owns the spec? Is the product engineer literally one person wearing all the hats, or a small team that collectively covers them?</p>
+  <p><strong>People:</strong> What do we do about the junior cohort, and how do you preserve the creative spark that made people love the craft while reeducating them toward spec and product work?</p>
+  <p><strong>Validity:</strong> Is Voss's assessment even right? Is the bottleneck really moving the way he says, or is that just one reading of the data?</p>
+  <p>If you have tried to drive this from the top, DM me if you would rather not comment publicly. I am asking because I think this is the problem underneath all the others.</p>
+
+  <p style="color:var(--text-faint);font-size:14px;">Sources: Laurie Voss, "AI Writes the Code. So What's Left for Engineers?" (AI Engineer talk, video linked below). MIT and Wharton study of AI coding tools across 100,000+ GitHub developers (741% lines of code, ~20% releases). Harvard study, "Artificial Intelligence in the Firm: Bottlenecks in Software Production" (Chen and Stratton, 718 firms). METR 2025 randomized trial (19% slower with AI, contested by a 2026 rerun). Google DORA 2024 report. Stanford Digital Economy Lab payroll data and SignalFire 2026 State of Talent report on junior employment. IBM February 2026 entry level hiring announcement (CHRO Nickle LaMoreaux). Voss talk video: https://youtu.be/kspZP5BgkEU</p>
+</div>
+</article>
+
+<footer>
+  <p>© 2026 Art Yalovenko · Built by hand, shipped with intent.</p>
+</footer>
+<script src="../autumn-bg.js?v=3"></script>
+</body>
+</html>
