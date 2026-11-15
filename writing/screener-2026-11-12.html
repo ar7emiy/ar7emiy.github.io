@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIMIC-Note-Extract, Lightfoot, SkillCDG · Art Yalovenko</title>
+<meta name="description" content="Research notes on hybrid extraction from 300k discharge summaries, GraphRAG with exact document deletion, and constraint dependency graphs for SOP compliance, and what they mean for insurance product work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=14">
+</head>
+<body>
+<div id="maple-mirrored-wave" aria-hidden="true"><canvas id="scene-canvas"></canvas></div>
+<div class="grain"></div>
+<header class="nav">
+  <a href="../index.html" class="logo">AY<span class="accent">.</span></a>
+  <nav class="nav-links">
+    <a href="../index.html#projects">Projects</a>
+    <a href="../index.html#experience">Experience</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="../index.html#contact" class="nav-cta">Contact</a>
+  </nav>
+</header>
+
+<article class="article">
+<div class="glass-panel">
+  <a href="../index.html#writing" class="back-link">← All writing</a>
+  <p class="article-meta"><span>Nov 12, 2026</span><span>·</span><span>Research screener</span></p>
+  <h1>MIMIC-Note-Extract, Lightfoot, SkillCDG</h1>
+  <p>Here is what stood out this week: three papers that are all, in different ways, about making extraction and retrieval auditable. MIMIC-Note-Extract turns 300,000 discharge summaries into queryable tables with a hybrid pipeline. Lightfoot makes GraphRAG deletion exact, so a document can be removed without rebuilding the graph. SkillCDG turns long SOP documents into dependency graphs so compliance checks retrieve the whole prerequisite chain instead of the most similar chunks. One paper from this week's screener is cut under the no-repeat rule: RGH-GNN reappeared with nothing substantively new, and it was covered in depth on October 27.</p>
+
+  <h2>1. MIMIC-Note-Extract: Hybrid Structured Extraction from 300k Discharge Summaries <span style="font-size:15px;color:var(--text-faint)">(ML4H 2026)</span></h2>
+  <p>Most clinical machine learning still ignores the rich free-text sections of discharge summaries, past history, allergies, findings, because the structured MIMIC tables do not contain them. This work converts 16 sections of 300,720 MIMIC-IV-Note discharge summaries into queryable structured tables, and the dataset is released on PhysioNet.</p>
+  <p><strong>Architecture:</strong> the pipeline is hybrid by design, and the split between its two halves is the idea. Deterministic parsing handles what is regular: section headers, document structure, and the templated scaffolding that discharge summaries share. Schema-guided LLM generation handles what varies: the free-text content inside each section, produced against a per-section schema so the output lands in a table rather than in prose. The two halves are complementary, rules where the document is predictable, a model where it is not, and the section schemas are what keep the LLM output queryable. Validation is done by medical doctors rather than by an automated judge, and the release also includes an agentic clinical decision-making benchmark built on the extracted tables.</p>
+  <p>Coverage runs 80 to 100 percent across sections, with the methods mixing rule, hybrid, and LLM approaches depending on the section. Medical-doctor validation shows above 92 percent extraction accuracy. The extracted tables add ten times more patient-history entries and medication histories for more than twice as many admissions relative to the existing structured tables. Those are the numbers that make this a dataset release worth noting rather than just a methods paper.</p>
+  <p>What I'd borrow: FNOL notes, claims narratives, and medical reports are long, sectioned, and semi-templated exactly like discharge summaries, so the pattern transfers directly. A hybrid of rules for headers and sections plus LLM generation for variable content is the practical route to high-accuracy, auditable extraction into entity graphs or claim models. The failure mode is also directly transferable: redaction artifacts and template variation in real claims systems will break pure LLM extraction, and boundary errors seen in related NER work will pollute entity linkage. Transfer needs three things. First, section schemas that match your own document types, not the hospital's. Second, clinician or adjuster validation on your own data, since accuracy on MIMIC text says nothing about accuracy on claims text. Third, provenance linking extracted rows back to source spans, because without it you cannot defend underwriting or fraud decisions. Reaction is thin outside the clinical ML community, with no widespread practitioner discussion yet; the dataset release is the main practical signal.</p>
+
+  <h2>2. Lightfoot: GraphRAG with Exact, Model-Free Document Deletion and Chunk Provenance <span style="font-size:15px;color:var(--text-faint)">(arXiv, Nov 2026)</span></h2>
+  <p>GraphRAG improves multi-hop question answering, but most systems make deletion either impossible or prohibitively expensive, because summaries and entities blend multiple documents. That matters more than it sounds: retention policies, right-to-erasure requests, and policy updates all require removing a document and everything derived from it. Lightfoot makes every entity, fact, and edge a deterministic function of per-passage extractions that carry chunk-level provenance, so deletion becomes exact.</p>
+  <p><strong>Architecture:</strong> the design has two phases, and the indexing phase is where the deletion guarantee is built. At index time, one LLM call per passage produces extraction in JSON: entities and facts with evidence quotes. Because every graph element is a deterministic function of those per-passage extractions, deleting a document means removing its passage extractions and recomputing, with no merged community summaries or cross-document entity merges to untangle. The paper verifies this exactly: the post-deletion graph is identical to a fresh index built from the remaining documents. At retrieval time, Lightfoot uses Personalized PageRank seeded from fact similarities, fused with a local cross-encoder, and makes no LLM calls at retrieval time. Training versus inference is minimal on the training side: there is no retriever training, just extraction at index time and a fixed retrieval procedure at query time. The code is public.</p>
+  <p>On MuSiQue with 11,000 passages, HotpotQA, and 2Wiki, Lightfoot reports the cheapest index among the systems compared: 26 to 31 percent below HippoRAG 2, and 3 to 6 times below LightRAG and fast-graphrag. Retrieval and answer metrics are competitive or better on two of the three sets. The cost result is the one to sit with, because it says provenance-exact indexing does not have to be the expensive option.</p>
+  <p>What I'd borrow: policies, endorsements, prior claims, and medical records change, and retention and regulatory erasure are non-negotiable. Systems that cannot delete a document and all derived graph state without regenerating community reports or entity merges will fail compliance, and that is a property to evaluate before adoption, not after. The failure mode is extraction quality: it still depends on the LLM schema, and noisy entity linking in highly templated claims text, repeated party names and policy numbers, can create spurious edges. Transfer needs three things. First, extraction prompts tuned to insurance entities: insured, claimant, vehicle, injury, coverage. Second, the same provenance discipline, so every graph node points to source spans. Third, evaluation on multi-hop questions that actually appear in claims, such as whether an injury pattern appears across related policies. Provenance-exact graphs also improve explainability for fraud or underwriting, which is a second reason to take this design seriously. Reaction is very thin: a recent arXiv preprint, mainly noticed in GraphRAG technical circles, with no major lab or industry commentary yet.</p>
+
+  <h2>3. SkillCDG: Constraint Dependency Graphs for Compliance Detection on Long SOP/Policy Documents <span style="font-size:15px;color:var(--text-faint)">(arXiv, Nov 2026)</span></h2>
+  <p>LLM agents auditing long, densely cross-referenced standard operating procedures fail in two specific ways: similarity retrieval pulls irrelevant rules and omits mandatory prerequisites, and context windows cannot hold the full document. SkillCDG converts each document into a constraint dependency graph and retrieves the closure of seed rules under a context budget, so the check sees the whole prerequisite chain.</p>
+  <p><strong>Architecture:</strong> the graph is the retrieval index. Each document becomes a constraint dependency graph in which atomic rules are nodes, mandatory prerequisites are edges, and every rule is anchored to its source span. Retrieval shifts from similarity to dependency closure: start from seed rules relevant to the question, then follow prerequisite edges until the context budget is reached. The retrieval policy itself is jointly optimized with group-relative policy optimization using verifiable rewards, format correctness plus verdict correctness, so the system learns to retrieve closures that lead to correct verdicts rather than just similar text. Training versus inference: the graph is built once per document, and at query time the work is closure computation under budget, not a fresh pass over the document.</p>
+  <p>Experiments on three enterprise datasets and two public benchmarks show accuracy and F1 gains over full-document and retrieval baselines. The comparison matters because the full-document baseline is the expensive option that still fails, and the retrieval baseline is the cheap option that retrieves the wrong rules.</p>
+  <p>What I'd borrow: policy wordings, underwriting guidelines, claims handling manuals, and regulatory SOPs are exactly this genre of long, cross-referenced, conditional text. Compliance checks, coverage determination, referral rules, fraud investigation steps, require the complete prerequisite chain, not the top-k similar chunks. The failure mode is structural: if your documents lack explicit if-then and prerequisite structure, graph construction will be incomplete or hallucinated. Transfer needs three things. First, high-quality rule atomization, possibly hybrid human plus LLM, since the graph is only as good as the atoms. Second, evaluation against real audit outcomes rather than synthetic verdicts. Third, integration with entity extraction, so that party and claim facts can be checked against the retrieved constraint subgraph. This is closer to production policy RAG than generic GraphRAG, and I would treat it as the pattern to copy for coverage and compliance checks. Reaction is thin: a fresh preprint with limited external discussion.</p>
+
+  <h2>Skipped this week</h2>
+  <p>What looked hot but is not worth the reader's time this week: autonomous multi-agent scientist systems, such as ScientistTwo from Google Cloud AI Research, that claim to improve on more than 80 percent of top-venue machine learning papers and generate full manuscripts. They continue to generate headlines, including recent discussion on X. The evaluation is largely AI-reviewed, the problems are well-defined ML research tasks with public benchmarks, and the systems lack the auditability, human-in-the-loop controls, domain-specific entity fidelity, and regulatory constraints required for claims, underwriting, or fraud workflows. Impressive research engineering, and a poor transfer candidate.</p>
+
+  <p style="color:var(--text-faint);font-size:14px;">Sources: MIMIC-Note-Extract, arXiv 2611.04685; Lightfoot, arXiv 2611.11010; SkillCDG, arXiv 2611.01042. Also reviewed this week, not covered in depth: CardioLM, arXiv 2611.07940; EAGR, arXiv 2611.01910; ArcRAG, arXiv 2611.06481; AgentArch, AACL 2026; RelGuard, arXiv 2611.09658; ScientistTwo, arXiv 2609.19644. Cut under the no-repeat rule: RGH-GNN (covered in depth October 27).</p>
+</div>
+</article>
+
+<footer>
+  <p>© 2026 Art Yalovenko · Built by hand, shipped with intent.</p>
+</footer>
+<script src="../autumn-bg.js?v=3"></script>
+</body>
+</html>
