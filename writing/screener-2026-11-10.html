@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ArcRAG, EAGR, RelGuard · Art Yalovenko</title>
+<meta name="description" content="Research notes on construction-portable GraphRAG retrieval, evidence-guided adaptive retrieval, and differentially private GraphRAG, and what they mean for insurance product work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=14">
+</head>
+<body>
+<div id="maple-mirrored-wave" aria-hidden="true"><canvas id="scene-canvas"></canvas></div>
+<div class="grain"></div>
+<header class="nav">
+  <a href="../index.html" class="logo">AY<span class="accent">.</span></a>
+  <nav class="nav-links">
+    <a href="../index.html#projects">Projects</a>
+    <a href="../index.html#experience">Experience</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="../index.html#contact" class="nav-cta">Contact</a>
+  </nav>
+</header>
+
+<article class="article">
+<div class="glass-panel">
+  <a href="../index.html#writing" class="back-link">← All writing</a>
+  <p class="article-meta"><span>Nov 10, 2026</span><span>·</span><span>Research screener</span></p>
+  <h1>ArcRAG, EAGR, RelGuard</h1>
+  <p>Here is what stood out this week: three papers that all ask what happens when the retrieval layer has to survive contact with real systems. ArcRAG tests whether one GraphRAG retriever can keep working when the graph underneath it is built differently. EAGR gets adaptive multi-hop retrieval without materializing a graph at all. RelGuard asks what it costs to make GraphRAG differentially private at the relation level. One paper from this week's screener is cut under the no-repeat rule: RGH-GNN reappeared with nothing substantively new, and it was covered in depth on October 27.</p>
+
+  <h2>1. ArcRAG: Agentic Compositional Retrieval over Knowledge Graphs <span style="font-size:15px;color:var(--text-faint)">(arXiv, Nov 2026; Domyn)</span></h2>
+  <p>Most GraphRAG systems co-design the retriever with the specific graph they build: typed schema-guided graphs on one side, open information extraction with free-text relations on the other. The retriever assumes the graph it was built for. ArcRAG tests whether a single retrieval procedure can stay effective when the underlying graph construction changes, without construction-specific schemas, relation names, or retuning. That is the question that matters for production, because extraction pipelines change and graphs get rebuilt, and a retriever that only works with the graph it was born with is a liability.</p>
+  <p><strong>Architecture:</strong> the system has an interface-induction step that runs first, then three agent roles. At inference time ArcRAG induces a query-local graph interface from the named entities in the question: the node labels, relation descriptors, and property keys reachable from those entities, so the retriever sees what this particular graph actually contains instead of assuming a fixed schema. Explorer agents then issue read-only Cypher queries to surface local (type, relation, type) patterns and aliases around those entities. A planner turns the question into subplans over that local interface, and a generator compiles each subplan into Cypher, executes it, and repairs the query on empty results, errors, unbound variables, or result sets that are too large. The loop retries within a pass budget, and passes repeat the plan-generate cycle. There is no retriever training here; the adaptation is all at inference time, through interface induction and repair, which is the point of the design. The evaluation keeps the retriever configuration fixed while the graph construction changes: the same MuSiQue, HotpotQA, and TriviaQA corpora built once as schema-guided graphs with typed nodes, closed relations, and source provenance, and once as open-IE graphs with untyped nodes and free-text relations.</p>
+  <p>The results hold up across both constructions, with schema-guided still ahead in absolute terms. On schema-guided graphs: 44.0 EM and 53.0 F1 on MuSiQue, 74.5 EM and 80.8 F1 on HotpotQA, and 87.9 F1 on TriviaQA. On open-IE graphs: 38.0 EM and 45.0 F1 on MuSiQue, 65.5 EM and 72.2 F1 on HotpotQA, and 71.6 F1 on TriviaQA. The paper reports results competitive with or above reported HippoRAG 2 and other systems on the same datasets, with the honest caveat that this is not a fully controlled head-to-head. Ablations vary the retry and pass budgets, and the comparison includes a Direct-Cypher agent baseline that plans without the induced interface.</p>
+  <p>What I'd borrow: claims, policies, FNOL, and medical notes produce messy, template-heavy text where entity extraction can be either ontology-guided, which I would prefer, or open. The failure mode this paper speaks to is one I have seen in practice: most published GraphRAG numbers assume the same pipeline built both the graph and the retriever, and switching extractors or adding provenance later collapses the system. Transfer needs one thing to hold: the query-time interface induction plus Cypher repair has to be robust to the aliasing, type drift, and incomplete provenance typical of claims text. If that holds, you can iterate on graph construction without rewriting the retriever, which is a real operational win. My own caution is that the evaluation is encyclopedic question answering, not templated insurance text, and the latency of the exploration and repair loop is not stressed in the paper. Reaction is thin; primarily the preprint itself.</p>
+
+  <h2>2. EAGR: Evidence-Guided Adaptive Graph Retrieval <span style="font-size:15px;color:var(--text-faint)">(arXiv, Nov 2026; IBM)</span></h2>
+  <p>Multi-hop retrieval needs the retrieval frontier to adapt as intermediate evidence appears, but explicit graph construction or repeated query rewriting is expensive. EAGR does this over an implicit semantic graph induced by compact passage metadata already stored in a standard VectorDB. No dedicated graph database, no explicit graph materialization, just metadata that is already there.</p>
+  <p><strong>Architecture:</strong> the system splits into an offline pass and an online loop. Offline, the pipeline extracts, grounds, and normalizes semantic descriptors per passage and stores them with the passage in the VectorDB. Online, retrieval starts from dense seed passages, then iterates: an LLM assesses the accumulated evidence, selects promising semantic directions, expands through metadata neighborhood lookup, and stops when the evidence is sufficient. The graph is implicit throughout, induced by the descriptors rather than built as a structure, and the LLM acts as the assessor that decides where the frontier goes next and when to stop. Training versus inference is therefore light on the training side: the descriptors are precomputed once, and the adaptation happens at query time through the assessment loop.</p>
+  <p>On 1,000 validation questions each from HotpotQA, 2WikiMultiHopQA, and MuSiQue, EAGR reports the highest LLM-based answer accuracy among the methods evaluated: 17 percentage points above vanilla RAG and 4 points above the strongest graph-aware baseline, averaged across the three sets. Ablations cover reordering and the individual components, plus qualitative multi-hop chains showing how the frontier moves.</p>
+  <p>What I'd borrow: long claims files and policy sets rarely justify a full Neo4j or similar for every use case, so a lighter alternative that runs on a VectorDB I already have is genuinely attractive. The failure mode is descriptor quality: on highly templated, repetitive medical and claims language, where the same phrases recur with low semantic diversity, the descriptors may not discriminate well enough to guide the frontier. Transfer needs two things to be true. First, the precomputed descriptors must capture the relational bridges that matter for multi-hop questions, such as claimant to provider to procedure to diagnosis. Second, the LLM assessor must not hallucinate sufficiency and stop early on a plausible but incomplete evidence set. I would use this as a lighter alternative or as a hybrid alongside full GraphRAG where construction cost is prohibitive, not as a replacement for the cases where the graph itself is the product. Reaction is thin; an IBM research preprint.</p>
+
+  <h2>3. RelGuard: Differentially Private GraphRAG (Protecting Relation Connectivity and Semantics) <span style="font-size:15px;color:var(--text-faint)">(arXiv, Nov 2026)</span></h2>
+  <p>Black-box access to GraphRAG systems lets adversaries reconstruct knowledge graphs, recovering both entity connectivity and relation semantics. RelGuard is the first differentially private framework for GraphRAG I have seen, and it sanitizes source documents before indexing rather than trying to protect the graph after the fact.</p>
+  <p><strong>Architecture:</strong> the contribution starts with a formalization, relation-DP, where distinguishability is bounded by the semantic distance between relations, accounting for removal. The defense itself has four steps: extract relations from the source documents, then perturb predicates or remove connectivity via the exponential mechanism, so that the indexed corpus no longer carries the exact relations an attacker would reconstruct. Sanitization happens before indexing, which means the privacy guarantee lives in the corpus, not in the query path. The privacy-utility trade-off is characterized across epsilon budgets, so a deployer can choose how much relation fidelity to trade for protection.</p>
+  <p>Evaluated on three GraphRAG systems, including LightRAG and PathRAG, and two datasets, against two reconstruction attacks, GRASP and GraphSteal. RelGuard reduces relation recovery F1 by 26.98 to 44.35 points versus the strongest baseline, while limiting the QA F1 drop to 2.98 to 8.97 percent in most settings. That is a meaningful protection gain for a single-digit utility cost, at least in these settings.</p>
+  <p>What I'd borrow: medical notes, claims narratives, and policy text contain sensitive relations, diagnosis to treatment, claimant to provider, that are exactly what a reconstruction attack would recover. The failure mode is scope: the sanitization is applied to documents before indexing, so if your GraphRAG is built on already-extracted structured data, or if adversaries have side-channel access, the guarantee does not apply. Transfer needs one thing to hold: relation predicates in your domain must have measurable semantic distances that the exponential mechanism can use without destroying the multi-hop utility you need. I would reach for this when regulatory or contractual constraints require formal privacy on the indexed corpus, and I would want the epsilon budget set against a real utility floor measured on claims questions, not on the paper's QA sets. Reaction is thin; an academic cryptography and AI preprint.</p>
+
+  <h2>Skipped this week</h2>
+  <p>What looked hot but is not worth the reader's time this week: broad claims that GraphRAG beats RAG. GraphRAG-Bench (ICLR 2026) and subsequent comparisons show the largest gains are on multi-hop and complex reasoning and on whole-corpus summarization; on point-fact queries the margin is often under a point, or reversed once a strong reranker is added. Microsoft's open-source GraphRAG repository is now in maintenance mode, with no new features. I would rather read papers that isolate construction portability, adaptive retrieval cost, or domain-specific failure modes than another aggregate leaderboard delta.</p>
+
+  <p style="color:var(--text-faint);font-size:14px;">Sources: ArcRAG, arXiv 2611.06481; EAGR, arXiv 2611.01910; RelGuard, arXiv 2611.09658. Also reviewed this week, not covered in depth: GraphRAG-Bench, arXiv 2506.05690; Microsoft GraphRAG repository status. Cut under the no-repeat rule: RGH-GNN (covered in depth October 27).</p>
+</div>
+</article>
+
+<footer>
+  <p>© 2026 Art Yalovenko · Built by hand, shipped with intent.</p>
+</footer>
+<script src="../autumn-bg.js?v=3"></script>
+</body>
+</html>
