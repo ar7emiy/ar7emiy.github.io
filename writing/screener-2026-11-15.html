@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic Claim Denial Analysis, Tool-Augmented UMLS Entity Linking, Efficient Money Laundering Detection · Art Yalovenko</title>
+<meta name="description" content="Research notes on a multi-agent claim denial system, tool-augmented biomedical entity linking, and budget-aware fraud case formation, and what they mean for insurance product work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=14">
+</head>
+<body>
+<div id="maple-mirrored-wave" aria-hidden="true"><canvas id="scene-canvas"></canvas></div>
+<div class="grain"></div>
+<header class="nav">
+  <a href="../index.html" class="logo">AY<span class="accent">.</span></a>
+  <nav class="nav-links">
+    <a href="../index.html#projects">Projects</a>
+    <a href="../index.html#experience">Experience</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="../index.html#contact" class="nav-cta">Contact</a>
+  </nav>
+</header>
+
+<article class="article">
+<div class="glass-panel">
+  <a href="../index.html#writing" class="back-link">← All writing</a>
+  <p class="article-meta"><span>Nov 15, 2026</span><span>·</span><span>Research screener</span></p>
+  <h1>Agentic Claim Denial Analysis, Tool-Augmented UMLS Entity Linking, Efficient Money Laundering Detection</h1>
+  <p>Here is what stood out this week: three papers that sit close to the work itself. One is a multi-agent system for claim denial analysis with a HIPAA compliance agent in the loop. One is an agent that links biomedical mentions against UMLS by calling ontology tools instead of trusting embedding similarity. One reframes fraud detection as a ranking problem under a hard investigation budget. One paper from this week's screener is cut under the no-repeat rule: ArcRAG was covered in depth on November 10, and this week's email adds detail rather than a new result, the Explorer ablation showing 15 to 39 EM points gained on schema-guided graphs and 12 to 32 on open-IE graphs, with the best configurations near 88 percent and 74 percent EM at five retries and five passes.</p>
+
+  <h2>1. Agentic AI for Healthcare Claim Denial Analysis: A Policy-Grounded Framework for Privacy Preservation <span style="font-size:15px;color:var(--text-faint)">(arXiv, Nov 2026)</span></h2>
+  <p>Claim denial analysis is a workflow insurance AI teams actually productize, and this paper builds a multi-agent system for it that combines predictive models, graph learning on diagnosis-procedure-medication codes, counterfactuals, Hybrid Contextual RAG grounded in payer policies, and a dedicated HIPAA compliance agent that redacts protected health information. The pattern, specialist agents plus policy-grounded retrieval plus a compliance gate, is the concrete shape a coworker system needs when it has to explain, cite, and stay privacy-safe.</p>
+  <p><strong>Architecture:</strong> a coordinator routes work to four specialist agents and a compliance agent. Denial Prediction runs an Optuna-tuned calibrated XGBoost model. Risk Drivers explains predictions with TreeSHAP. Code Combinations runs an edge-conditioned message-passing neural network, a GNN, over a co-occurrence graph of diagnosis, procedure, and medication codes. Counterfactual Causality explores what would have changed the outcome. A Hybrid Contextual RAG component retrieves the payer policy passages that ground the analysis, and the HIPAA agent reviews the output and redacts protected health information before anything is delivered. Training versus inference: the predictive models are trained on a synthetic dataset of 99,079 claims with a 27.4 percent denial rate, and at inference the full analysis runs in about 18 seconds per claim with gpt-oss-120b on Groq.</p>
+  <p>The reported results are strong on the process metrics that matter for this kind of system: the denial model reaches ROC-AUC 0.90 with precision 0.80 and recall 0.76, 98 percent traceability of numerical findings, 214 of 216 policy citations validated, and all 280 identified sensitive identifiers removed without changing the analysis. Those numbers describe a system that can show its work, which is the precondition for deploying it anywhere regulated.</p>
+  <p>What I'd borrow: the specialist-agent plus policy-grounded RAG plus compliance-gate pattern is directly reusable for denial and coverage work, and the traceability and citation metrics are the right ones to demand from any coworker system. The failure modes are worth naming plainly. The data is synthetic, there is no real payer policy corpus and no production latency or cost numbers, the GNN and XGBoost details are standard rather than novel, and traceability and citation metrics are necessary but not sufficient for correctness under distribution shift. Transfer to property and casualty or life claims requires the same agents grounded in actual policy language and form versions, and the GNN code graph has to reflect real ICD and CPT co-occurrence noise rather than synthetic cleanliness. Reaction is limited to paper-bot posts so far, with no independent technical critique yet.</p>
+
+  <h2>2. Tool-Augmented Disambiguation LLM Agent Utilizing UMLS for Biomedical Entity Linking <span style="font-size:15px;color:var(--text-faint)">(ICAART 2026)</span></h2>
+  <p>Static embedding matching and single-stage LLM prompting underperform on biomedical entity linking, because UMLS is large and lexical variability is high. This paper builds an agent that calls lexical, semantic-type, and relational UMLS tools iteratively and improves top-1 exact concept match that way, grounding each decision against the ontology instead of relying on embedding similarity alone.</p>
+  <p><strong>Architecture:</strong> the pipeline starts with SapBERT candidate retrieval, then iterates through tool calls: semantic-type validation to check that a candidate concept has the right type, ontology-driven neighbor expansion to explore related concepts, and iterative function-calling reasoning that refines the choice across rounds. The agent, not a single prompt, decides when it has enough evidence to commit to a concept unique identifier. Training versus inference is light: SapBERT provides the retrieval backbone, and the disambiguation work happens at inference time through the tool loop.</p>
+  <p>On a 1,000-mention subset of MedMentions ST21pv, the agent reaches 68.3 percent top-1 exact CUI match, against QuickUMLS at 20.5 percent, BioBERT at 33.2 percent, GPT-4o few-shot at 35.1 percent, SciSpacy at 39 percent, and SapBERT alone at 51.8 percent. The gap between SapBERT alone and the full agent is the measure of what the tool loop adds.</p>
+  <p>What I'd borrow: medical notes and FNOL narratives contain the same ambiguous clinical mentions that must be normalized before any claims graph or fraud signal can be trusted, and an agent that grounds against a large ontology rather than relying on embedding similarity is the right direction for entity resolution in long templated text. The failure modes are scope and cost. The evaluation covers only a 1,000-mention subset of a public benchmark, the cost and latency of multi-tool iterative calls are not reported, and UMLS is biomedical, not insurance-specific: policy terms, coverage codes, and vehicle parts are outside it. Transfer requires either a domain ontology of comparable coverage or a hybrid where UMLS is one tool among insurance-specific lexical resources, plus evaluation on real claims notes rather than PubMed-style text. Reaction is thin, with nothing visible outside the proceedings.</p>
+
+  <h2>3. Efficient Money Laundering Detection through Graph-Based Prioritization <span style="font-size:15px;color:var(--text-faint)">(ICEIS 2026)</span></h2>
+  <p>Anti-money-laundering monitoring has to rank a tiny fraction of high-volume transactions for investigation under hard capacity limits, and standard AUC and F1 ignore that constraint. This paper builds a two-stage pipeline that first ranks transactions with a GNN, then turns the top-k percent into investigable cases, and it evaluates the whole thing on budget-aware metrics instead of leaderboard scores.</p>
+  <p><strong>Architecture:</strong> the pipeline has two stages. First, a GNN encoder plus an edge decoder scores transactions on a directed transactional multigraph, and four encoders are evaluated. Second, the top-k percent of ranked transactions are turned into cases via weakly connected components and controlled subgraph induction, so an investigator receives a bounded case with its context rather than a flat list of alerts. The evaluation metrics are the operational ones: Recall at k percent, inspections per illicit transaction, case-level coverage, induced-context purity, and intra-case completeness, with an explicit coverage-purity trade-off as k grows. Training versus inference: the encoders are trained on out-of-time AMLSim splits, and at inference the ranking and case formation run over the transaction stream.</p>
+  <p>GraphSAGE reports Recall at 1 percent of 0.877 on AML100k and 0.870 on AML1M, with 7.94 inspections per illicit transaction at k equal to 1 percent, and about 0.74 million edges per second on AML1M. The inspections-per-illicit number is the one that matters operationally: it says how much analyst time each true positive costs at a fixed review budget.</p>
+  <p>What I'd borrow: fraud and SIU teams face the same capacity constraint, and most alerts are noise. Ranking plus case formation that explicitly optimizes inspections per true positive is more operationally relevant than another AUC leaderboard, and I would copy the budget-aware metrics first, before any model. The failure modes are data and structure. AMLSim is synthetic, real insurance fraud graphs are heterogeneous, policy, claim, party, contractor, medical provider, and far sparser and noisier, and the method assumes a clean transactional multigraph. Transfer requires the same budget-aware metrics measured on real claims-fraud graphs, plus handling for heterophily and missing edges that dominate insurance data. Reaction is thin, with nothing visible outside the conference.</p>
+
+  <h2>Skipped this week</h2>
+  <p>What looked hot but is not worth the reader's time this week: the repeated news that Microsoft's original GraphRAG repository is now explicitly in maintenance mode, with no new features, and the recent wave of hybrid GNN-Transformer for fraud posts and vendor GraphRAG toolkit announcements. The latter either lack controlled ablations, use synthetic data without budget-aware metrics, or read as marketing. None of them move the needle for templated claims text or operational fraud graphs relative to the three items above, and the maintenance-mode news is worth one line, not a paper.</p>
+
+  <p style="color:var(--text-faint);font-size:14px;">Sources: Agentic AI for Healthcare Claim Denial Analysis, arXiv 2611.09423; Tool-Augmented Disambiguation LLM Agent Utilizing UMLS for Biomedical Entity Linking, ICAART 2026; Efficient Money Laundering Detection through Graph-Based Prioritization, ICEIS 2026. Also reviewed this week, not covered in depth: RelGuard, arXiv 2611.09658; Typed-Centrality Grounding for Agentic GraphRAG, arXiv 2611.09414; ForesightRAG; RAG vs GraphRAG systematic evaluation, KDD 2026; Microsoft GraphRAG repository status; practitioner thread on ArcRAG. Cut under the no-repeat rule: ArcRAG (covered in depth November 10).</p>
+</div>
+</article>
+
+<footer>
+  <p>© 2026 Art Yalovenko · Built by hand, shipped with intent.</p>
+</footer>
+<script src="../autumn-bg.js?v=3"></script>
+</body>
+</html>
